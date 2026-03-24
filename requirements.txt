@@ -7,3 +7,4 @@ aiohttp
 apscheduler
 pydantic-settings
 python-dotenv
+jinja2
