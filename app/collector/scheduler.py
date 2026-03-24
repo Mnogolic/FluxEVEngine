@@ -1,6 +1,6 @@
 import asyncio
 import logging
-from datetime import date
+from datetime import datetime
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from sqlalchemy import select
 from app.db.session import SessionLocal
@@ -16,33 +16,50 @@ async def collect_market_history():
     async with SessionLocal() as session:
         items = (await session.execute(select(TrackedItem))).scalars().all()
 
-    today = date.today()
     tasks = []
     for item in items:
         for region_id in TOP_REGIONS:
-            tasks.append(_fetch_and_store(item.type_id, region_id, today))
+            tasks.append(_fetch_and_store(item.type_id, region_id))
 
-    await asyncio.gather(*tasks, return_exceptions=True)
-    logger.info("Market history collection done.")
+    results = await asyncio.gather(*tasks, return_exceptions=True)
+    errors = [r for r in results if isinstance(r, Exception)]
+    if errors:
+        for e in errors[:5]:
+            logger.error(f"Collection error: {e}")
+    logger.info(f"Market history collection done. Errors: {len(errors)}/{len(tasks)}")
 
 
-async def _fetch_and_store(type_id: int, region_id: int, today: date):
+async def _fetch_and_store(type_id: int, region_id: int):
     try:
         history = await get_market_history(region_id, type_id)
-        today_entry = next((h for h in history if h["date"] == str(today)), None)
-        if not today_entry:
+        if not history:
+            logger.warning(f"Empty history for {type_id} / {region_id}")
             return
 
+        # берём последний доступный день (ESI обновляет с задержкой ~1 день)
+        latest = sorted(history, key=lambda x: x["date"])[-1]
+        latest_date = datetime.strptime(latest["date"], "%Y-%m-%d")
+
         async with SessionLocal() as session:
+            existing = await session.execute(
+                select(MarketHistory).where(
+                    MarketHistory.type_id == type_id,
+                    MarketHistory.region_id == region_id,
+                    MarketHistory.date == latest_date,
+                )
+            )
+            if existing.scalar_one_or_none():
+                return
+
             session.add(MarketHistory(
                 type_id=type_id,
                 region_id=region_id,
-                date=today_entry["date"],
-                average=today_entry["average"],
-                highest=today_entry["highest"],
-                lowest=today_entry["lowest"],
-                volume=today_entry["volume"],
-                order_count=today_entry["order_count"],
+                date=latest_date,
+                average=latest["average"],
+                highest=latest["highest"],
+                lowest=latest["lowest"],
+                volume=latest["volume"],
+                order_count=latest["order_count"],
             ))
             await session.commit()
     except Exception as e:

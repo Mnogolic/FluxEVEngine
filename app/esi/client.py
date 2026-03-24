@@ -9,7 +9,7 @@ class ESIClient:
 
     async def start(self):
         self._session = aiohttp.ClientSession(
-            base_url=settings.esi_base_url,
+            base_url=settings.esi_base_url.rstrip('/') + '/',
             headers={"Accept": "application/json"},
         )
 
@@ -18,7 +18,7 @@ class ESIClient:
             await self._session.close()
 
     async def get(self, path: str, **params) -> dict | list:
-        async with self._session.get(path, params=params) as resp:
+        async with self._session.get(path.lstrip('/'), params=params) as resp:
             resp.raise_for_status()
             return await resp.json()
 
