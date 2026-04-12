@@ -25,7 +25,6 @@ PLEX_PACK_USD = 19.99
 
 
 async def get_plex_price_isk() -> float:
-    """Текущая цена 1 PLEX в ISK из Jita."""
     try:
         async with aiohttp.ClientSession() as session:
             async with session.get(
@@ -37,16 +36,14 @@ async def get_plex_price_isk() -> float:
             return 6_000_000
         return min(o["price"] for o in orders)
     except Exception:
-        return 6_000_000  # fallback
+        return 6_000_000
 
 
 @router.get("/", response_class=HTMLResponse)
 async def dashboard(request: Request, db: AsyncSession = Depends(get_db)):
-    # курс ISK -> USD
     plex_isk = await get_plex_price_isk()
     isk_per_usd = (PLEX_PER_PACK * plex_isk) / PLEX_PACK_USD
 
-    # ISK оборот по хабам (volume * average)
     hub_rows = (await db.execute(
         select(
             MarketHistory.region_id,
@@ -60,7 +57,6 @@ async def dashboard(request: Request, db: AsyncSession = Depends(get_db)):
     hub_values_isk = [float(r.isk_total) for r in hub_rows]
     hub_values_usd = [round(v / isk_per_usd, 2) for v in hub_values_isk]
 
-    # топ 20 товаров в Jita по ISK обороту
     item_rows = (await db.execute(
         select(
             TrackedItem.name,
@@ -80,6 +76,18 @@ async def dashboard(request: Request, db: AsyncSession = Depends(get_db)):
     last_date_row = (await db.execute(select(func.max(MarketHistory.date)))).scalar()
     last_date = last_date_row.strftime("%Y-%m-%d") if last_date_row else "N/A"
 
+    # список товаров у которых есть история в Jita — для селектора
+    selector_rows = (await db.execute(
+        select(TrackedItem.type_id, TrackedItem.name)
+        .join(MarketHistory, MarketHistory.type_id == TrackedItem.type_id)
+        .where(MarketHistory.region_id == 10000002)
+        .group_by(TrackedItem.type_id, TrackedItem.name)
+        .having(func.count(MarketHistory.id) >= 3)
+        .order_by(TrackedItem.name)
+    )).all()
+
+    selector_items = [{"type_id": r.type_id, "name": r.name} for r in selector_rows]
+
     return templates.TemplateResponse(request, "dashboard.html", {
         "hub_labels": hub_labels,
         "hub_values_isk": hub_values_isk,
@@ -89,4 +97,5 @@ async def dashboard(request: Request, db: AsyncSession = Depends(get_db)):
         "item_values_usd": item_values_usd,
         "last_date": last_date,
         "plex_isk": int(plex_isk),
+        "selector_items": selector_items,
     })

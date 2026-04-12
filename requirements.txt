@@ -8,3 +8,4 @@ apscheduler
 pydantic-settings
 python-dotenv
 jinja2
+numpy

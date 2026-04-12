@@ -1,5 +1,6 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 from app.esi.client import esi
 from app.collector.scheduler import start_scheduler
 from app.api.market import router as market_router
@@ -17,3 +18,4 @@ async def lifespan(app: FastAPI):
 app = FastAPI(title="FluxEVEngine", lifespan=lifespan)
 app.include_router(market_router)
 app.include_router(dashboard_router)
+app.mount("/static", StaticFiles(directory="static"), name="static")

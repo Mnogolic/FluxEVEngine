@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>FluxEV — Market Overview</title>
-    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    <script src="/static/plotly.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { background: #0d1117; color: #e6edf3; font-family: 'Segoe UI', sans-serif; padding: 24px; }
@@ -12,10 +12,18 @@
         .charts { display: flex; flex-wrap: wrap; gap: 24px; }
         .chart-box { background: #161b22; border: 1px solid #30363d; border-radius: 10px; padding: 20px; flex: 1; min-width: 420px; }
         .chart-box h2 { font-size: 15px; color: #c9d1d9; margin-bottom: 16px; }
+        .selector-row { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+        select {
+            background: #21262d; color: #e6edf3; border: 1px solid #30363d;
+            border-radius: 6px; padding: 6px 12px; font-size: 13px; min-width: 280px;
+        }
+        .meta { font-size: 12px; color: #8b949e; }
+        #trend-up { color: #3fb950; }
+        #trend-down { color: #f78166; }
     </style>
 </head>
 <body>
-    <h1>FluxEV Engine — Market Overview</h1>
+    <h1>FluxEVyEngine — Market Overview</h1>
     <p class="sub">Data from ESI Tranquility &middot; Last update: {{ last_date }} &middot; PLEX: {{ plex_isk }} ISK</p>
 
     <div class="charts">
@@ -26,6 +34,28 @@
         <div class="chart-box">
             <h2>Top 20 Items by Turnover in Jita</h2>
             <div id="chart-items"></div>
+        </div>
+    </div>
+
+    <div class="charts" style="margin-top: 24px">
+        <div class="chart-box" style="min-width: 100%">
+            <h2>Price History + 7-day Forecast — Linear Regression</h2>
+            <div class="selector-row">
+                <select id="item-select" onchange="loadChart()">
+                    {% for item in selector_items %}
+                    <option value="{{ item.type_id }}">{{ item.name }}</option>
+                    {% endfor %}
+                </select>
+                <select id="region-select" onchange="loadChart()">
+                    <option value="10000002">Jita</option>
+                    <option value="10000043">Amarr</option>
+                    <option value="10000032">Dodixie</option>
+                    <option value="10000042">Hek</option>
+                    <option value="10000030">Rens</option>
+                </select>
+                <span class="meta" id="chart-meta"></span>
+            </div>
+            <div id="chart-price"></div>
         </div>
     </div>
 
@@ -53,24 +83,59 @@
         }
 
         Plotly.newPlot('chart-hubs', [{
-            type: 'pie',
-            labels: hubLabels,
-            values: hubValuesIsk,
-            hole: 0.4,
+            type: 'pie', labels: hubLabels, values: hubValuesIsk, hole: 0.4,
             textinfo: 'label+percent',
             text: hoverText(hubValuesIsk, hubValuesUsd),
             hovertemplate: '<b>%{label}</b><br>%{text}<extra></extra>',
         }], { ...layout, height: 400 });
 
         Plotly.newPlot('chart-items', [{
-            type: 'pie',
-            labels: itemLabels,
-            values: itemValuesIsk,
-            hole: 0.4,
+            type: 'pie', labels: itemLabels, values: itemValuesIsk, hole: 0.4,
             textinfo: 'label+percent',
             text: hoverText(itemValuesIsk, itemValuesUsd),
             hovertemplate: '<b>%{label}</b><br>%{text}<extra></extra>',
         }], { ...layout, height: 400 });
+
+        async function loadChart() {
+            const typeId   = document.getElementById('item-select').value;
+            const regionId = document.getElementById('region-select').value;
+            const res = await fetch(`/market/price/${typeId}?region_id=${regionId}`);
+            const d = await res.json();
+
+            const priceLayout = {
+                paper_bgcolor: '#161b22', plot_bgcolor: '#161b22',
+                font: { color: '#c9d1d9', size: 12 },
+                margin: { t: 40, b: 60, l: 70, r: 20 },
+                height: 400,
+                xaxis: { title: 'Date', gridcolor: '#21262d', tickangle: -45 },
+                yaxis: { title: 'Price (ISK)', gridcolor: '#21262d' },
+                legend: { orientation: 'h', y: 1.1 },
+            };
+
+            Plotly.newPlot('chart-price', [
+                {
+                    type: 'scatter', mode: 'lines+markers', name: 'Actual price',
+                    x: d.dates, y: d.values,
+                    line: { color: '#58a6ff', width: 2 }, marker: { size: 4 },
+                    hovertemplate: '%{x}<br>Price: %{y:.4f} ISK<extra></extra>',
+                },
+                {
+                    type: 'scatter', mode: 'lines+markers', name: '7-day forecast',
+                    x: d.forecast_dates, y: d.forecast_values,
+                    line: { color: '#f78166', width: 2, dash: 'dash' },
+                    marker: { size: 6, symbol: 'diamond' },
+                    hovertemplate: '%{x}<br>Forecast: %{y:.4f} ISK<extra></extra>',
+                }
+            ], priceLayout);
+
+            const arrow = d.slope >= 0 ? '↑' : '↓';
+            const color = d.slope >= 0 ? '#3fb950' : '#f78166';
+            document.getElementById('chart-meta').innerHTML =
+                `<span style="color:${color}">${arrow} ${d.slope > 0 ? '+' : ''}${d.slope.toFixed(4)} ISK/day</span>
+                 &nbsp;·&nbsp; R² = ${d.r2} &nbsp;·&nbsp; ${d.dates.length} data points`;
+        }
+
+        loadChart();
     </script>
 </body>
 </html>
