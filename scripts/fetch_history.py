@@ -43,7 +43,7 @@ async def main():
     cutoff = datetime.now() - timedelta(days=DAYS)
 
     async with SessionLocal() as db:
-        items = (await db.execute(select(TrackedItem).limit(100))).scalars().all()
+        items = (await db.execute(select(TrackedItem))).scalars().all()
 
     logger.info("=" * 60)
     logger.info("FluxEV Engine — Historical Data Fetcher")

@@ -59,12 +59,16 @@ async def dashboard(request: Request, db: AsyncSession = Depends(get_db)):
 
     item_rows = (await db.execute(
         select(
+            TrackedItem.type_id,
             TrackedItem.name,
             func.sum(MarketHistory.volume * MarketHistory.average).label("isk_total")
         )
         .join(TrackedItem, TrackedItem.type_id == MarketHistory.type_id)
-        .where(MarketHistory.region_id == 10000002)
-        .group_by(TrackedItem.name)
+        .where(
+            MarketHistory.region_id == 10000002,
+            TrackedItem.type_id.notin_([92149, 60459])  # Drone Iteration Data, Rogue Drone Infestation Data
+        )
+        .group_by(TrackedItem.type_id, TrackedItem.name)
         .order_by(func.sum(MarketHistory.volume * MarketHistory.average).desc())
         .limit(20)
     )).all()
@@ -76,17 +80,11 @@ async def dashboard(request: Request, db: AsyncSession = Depends(get_db)):
     last_date_row = (await db.execute(select(func.max(MarketHistory.date)))).scalar()
     last_date = last_date_row.strftime("%Y-%m-%d") if last_date_row else "N/A"
 
-    # список товаров у которых есть история в Jita — для селектора
-    selector_rows = (await db.execute(
-        select(TrackedItem.type_id, TrackedItem.name)
-        .join(MarketHistory, MarketHistory.type_id == TrackedItem.type_id)
-        .where(MarketHistory.region_id == 10000002)
-        .group_by(TrackedItem.type_id, TrackedItem.name)
-        .having(func.count(MarketHistory.id) >= 3)
-        .order_by(TrackedItem.name)
-    )).all()
-
-    selector_items = [{"type_id": r.type_id, "name": r.name} for r in selector_rows]
+    # список товаров для селектора — те же топ 20 что на графике
+    selector_items = [{
+        "type_id": r.type_id,
+        "name": r.name
+    } for r in item_rows]
 
     return templates.TemplateResponse(request, "dashboard.html", {
         "hub_labels": hub_labels,

@@ -10,7 +10,7 @@
         h1 { font-size: 22px; color: #58a6ff; margin-bottom: 4px; }
         p.sub { color: #8b949e; font-size: 13px; margin-bottom: 32px; }
         .charts { display: flex; flex-wrap: wrap; gap: 24px; }
-        .chart-box { background: #161b22; border: 1px solid #30363d; border-radius: 10px; padding: 20px; flex: 1; min-width: 420px; }
+        .chart-box { background: #161b22; border: 1px solid #30363d; border-radius: 10px; padding: 20px; flex: 1; min-width: 420px; min-height: 560px; }
         .chart-box h2 { font-size: 15px; color: #c9d1d9; margin-bottom: 16px; }
         .selector-row { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
         select {
@@ -33,7 +33,10 @@
         </div>
         <div class="chart-box">
             <h2>Top 20 Items by Turnover in Jita</h2>
-            <div id="chart-items"></div>
+            <div style="display: flex; gap: 16px; align-items: flex-start;">
+                <div id="chart-items" style="flex: 1;"></div>
+                <div id="items-legend" style="min-width: 200px; font-size: 12px; color: #c9d1d9; padding-top: 8px;"></div>
+            </div>
         </div>
     </div>
 
@@ -87,14 +90,36 @@
             textinfo: 'label+percent',
             text: hoverText(hubValuesIsk, hubValuesUsd),
             hovertemplate: '<b>%{label}</b><br>%{text}<extra></extra>',
-        }], { ...layout, height: 400 });
+            domain: { x: [0.1, 0.9], y: [0, 1] },
+        }], { ...layout, height: 480, autosize: true });
 
         Plotly.newPlot('chart-items', [{
             type: 'pie', labels: itemLabels, values: itemValuesIsk, hole: 0.4,
             textinfo: 'label+percent',
+            textposition: 'outside',
             text: hoverText(itemValuesIsk, itemValuesUsd),
             hovertemplate: '<b>%{label}</b><br>%{text}<extra></extra>',
-        }], { ...layout, height: 400 });
+            domain: { x: [0.0, 1.0], y: [0, 1] },
+        }], {
+            ...layout,
+            height: 520,
+            autosize: true,
+            margin: { t: 40, b: 40, l: 120, r: 120 },
+            showlegend: false,
+        });
+
+        // список товаров справа
+        const colors = ['#636efa','#ef553b','#00cc96','#ab63fa','#ffa15a',
+                        '#19d3f3','#ff6692','#b6e880','#ff97ff','#fecb52',
+                        '#1f77b4','#ff7f0e','#2ca02c','#d62728','#9467bd',
+                        '#8c564b','#e377c2','#7f7f7f','#bcbd22','#17becf'];
+        const legend = document.getElementById('items-legend');
+        legend.innerHTML = itemLabels.map((name, i) =>
+            `<div style="display:flex; align-items:center; gap:6px; margin-bottom:6px;">
+                <div style="width:10px; height:10px; border-radius:2px; background:${colors[i % colors.length]}; flex-shrink:0;"></div>
+                <span style="color:#8b949e;">${name}</span>
+            </div>`
+        ).join('');
 
         async function loadChart() {
             const typeId   = document.getElementById('item-select').value;
