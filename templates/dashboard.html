@@ -2,164 +2,680 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>FluxEV — Market Overview</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FluxEV - Market Overview</title>
     <script src="/static/plotly.min.js"></script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: #0d1117; color: #e6edf3; font-family: 'Segoe UI', sans-serif; padding: 24px; }
-        h1 { font-size: 22px; color: #58a6ff; margin-bottom: 4px; }
-        p.sub { color: #8b949e; font-size: 13px; margin-bottom: 32px; }
-        .charts { display: flex; flex-wrap: wrap; gap: 24px; }
-        .chart-box { background: #161b22; border: 1px solid #30363d; border-radius: 10px; padding: 20px; flex: 1; min-width: 420px; min-height: 560px; }
-        .chart-box h2 { font-size: 15px; color: #c9d1d9; margin-bottom: 16px; }
-        .selector-row { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
-        select {
-            background: #21262d; color: #e6edf3; border: 1px solid #30363d;
-            border-radius: 6px; padding: 6px 12px; font-size: 13px; min-width: 280px;
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
-        .meta { font-size: 12px; color: #8b949e; }
-        #trend-up { color: #3fb950; }
-        #trend-down { color: #f78166; }
+
+        body {
+            min-width: 320px;
+            background: #0d1117;
+            color: #e6edf3;
+            font-family: "Segoe UI", Arial, sans-serif;
+            padding: 24px;
+        }
+
+        .page {
+            width: min(100%, 1480px);
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: #58a6ff;
+            font-size: 24px;
+            font-weight: 650;
+            line-height: 1.2;
+            margin-bottom: 6px;
+        }
+
+        .sub {
+            color: #8b949e;
+            font-size: 13px;
+            line-height: 1.5;
+            margin-bottom: 24px;
+        }
+
+        .charts {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 20px;
+        }
+
+        .chart-box {
+            min-width: 0;
+            min-height: 0;
+            overflow: hidden;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            background: #161b22;
+            padding: 18px;
+        }
+
+        .chart-box h2 {
+            color: #c9d1d9;
+            font-size: 15px;
+            font-weight: 650;
+            line-height: 1.35;
+            margin-bottom: 12px;
+        }
+
+        .chart-head {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .chart-head h2 {
+            margin-bottom: 0;
+        }
+
+        .chart-controls {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .control-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #8b949e;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        .toggle-label {
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .toggle-label input {
+            width: 15px;
+            height: 15px;
+            accent-color: #58a6ff;
+        }
+
+        .chart-note,
+        .item-detail {
+            color: #8b949e;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+
+        .chart-note {
+            margin-top: -2px;
+            margin-bottom: 8px;
+        }
+
+        .item-detail {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .fixed-badge {
+            display: inline-flex;
+            align-items: center;
+            min-height: 20px;
+            border: 1px solid rgba(255, 166, 87, 0.45);
+            border-radius: 999px;
+            background: rgba(255, 166, 87, 0.12);
+            color: #ffa657;
+            font-size: 11px;
+            font-weight: 650;
+            line-height: 1;
+            padding: 4px 8px;
+        }
+
+        .chart-shell {
+            width: 100%;
+            min-width: 0;
+        }
+
+        .pie-chart {
+            width: 100%;
+            height: 430px;
+        }
+
+        .legend-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+            gap: 8px 12px;
+            margin-top: 8px;
+            padding-right: 4px;
+        }
+
+        .legend-item {
+            display: grid;
+            grid-template-columns: 10px minmax(0, 1fr) auto;
+            align-items: center;
+            gap: 8px;
+            min-width: 0;
+            color: #8b949e;
+            font-size: 12px;
+            line-height: 1.3;
+        }
+
+        .legend-swatch {
+            width: 10px;
+            height: 10px;
+            border-radius: 2px;
+        }
+
+        .legend-name {
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .legend-share {
+            color: #c9d1d9;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .wide {
+            grid-column: 1 / -1;
+            margin-top: 20px;
+        }
+
+        .selector-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        select,
+        input[type="number"] {
+            min-width: 220px;
+            max-width: 100%;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            background: #21262d;
+            color: #e6edf3;
+            font-size: 13px;
+            padding: 7px 10px;
+        }
+
+        .chart-controls select,
+        .chart-controls input[type="number"] {
+            min-width: 96px;
+            padding: 6px 9px;
+        }
+
+        #jita-top-count {
+            width: 92px;
+        }
+
+        #item-select {
+            flex: 1 1 440px;
+        }
+
+        #region-select {
+            flex: 0 1 180px;
+        }
+
+        .meta {
+            min-width: 280px;
+            color: #8b949e;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+
+        #chart-price {
+            width: 100%;
+            height: 420px;
+        }
+
+        @media (max-width: 980px) {
+            body {
+                padding: 16px;
+            }
+
+            .charts {
+                grid-template-columns: 1fr;
+            }
+
+            .pie-chart {
+                height: 380px;
+            }
+
+            .legend-grid {
+                grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+            }
+        }
+
+        @media (max-width: 560px) {
+            body {
+                padding: 12px;
+            }
+
+            .chart-box {
+                padding: 14px;
+            }
+
+            .pie-chart {
+                height: 330px;
+            }
+
+            .legend-grid {
+                grid-template-columns: 1fr;
+            }
+
+            select,
+            #item-select,
+            #region-select,
+            .meta {
+                width: 100%;
+                flex-basis: 100%;
+                min-width: 0;
+            }
+        }
     </style>
 </head>
 <body>
-    <h1>FluxEVyEngine — Market Overview</h1>
-    <p class="sub">Data from ESI Tranquility &middot; Last update: {{ last_date }} &middot; PLEX: {{ plex_isk }} ISK</p>
+    <main class="page">
+        <h1>FluxEV Engine - Market Overview</h1>
+        <p class="sub">Data from ESI Tranquility &middot; Last update: {{ last_date }} &middot; PLEX: {{ plex_isk }} ISK</p>
 
-    <div class="charts">
-        <div class="chart-box">
-            <h2>Trade Turnover by Hub (ISK)</h2>
-            <div id="chart-hubs"></div>
-        </div>
-        <div class="chart-box">
-            <h2>Top 20 Items by Turnover in Jita</h2>
-            <div style="display: flex; gap: 16px; align-items: flex-start;">
-                <div id="chart-items" style="flex: 1;"></div>
-                <div id="items-legend" style="min-width: 200px; font-size: 12px; color: #c9d1d9; padding-top: 8px;"></div>
-            </div>
-        </div>
-    </div>
+        <section class="charts">
+            <article class="chart-box">
+                <h2>Trade Turnover by Hub (ISK)</h2>
+                <div class="chart-shell">
+                    <div id="chart-hubs" class="pie-chart"></div>
+                    <div id="hubs-legend" class="legend-grid"></div>
+                </div>
+            </article>
 
-    <div class="charts" style="margin-top: 24px">
-        <div class="chart-box" style="min-width: 100%">
-            <h2>Price History + 7-day Forecast — Linear Regression</h2>
-            <div class="selector-row">
-                <select id="item-select" onchange="loadChart()">
-                    {% for item in selector_items %}
-                    <option value="{{ item.type_id }}">{{ item.name }}</option>
-                    {% endfor %}
-                </select>
-                <select id="region-select" onchange="loadChart()">
-                    <option value="10000002">Jita</option>
-                    <option value="10000043">Amarr</option>
-                    <option value="10000032">Dodixie</option>
-                    <option value="10000042">Hek</option>
-                    <option value="10000030">Rens</option>
-                </select>
-                <span class="meta" id="chart-meta"></span>
-            </div>
-            <div id="chart-price"></div>
-        </div>
-    </div>
+            <article class="chart-box">
+                <div class="chart-head">
+                    <h2 id="items-chart-title">Top 100 Items by Turnover in Jita + Other</h2>
+                    <div class="chart-controls">
+                        <label class="control-label">
+                            View
+                            <select id="jita-mode-select" onchange="renderJitaItemsPie()">
+                                <option value="top" selected>Top items</option>
+                                <option value="all">All items</option>
+                            </select>
+                        </label>
+                        <label class="control-label">
+                            Top
+                            <input id="jita-top-count" type="number" min="1" value="100" onchange="renderJitaItemsPie()" oninput="renderJitaItemsPie()">
+                        </label>
+                        <label class="control-label toggle-label">
+                            <input id="jita-other-toggle" type="checkbox" checked onchange="renderJitaItemsPie()">
+                            Other
+                        </label>
+                    </div>
+                </div>
+                <div id="items-chart-note" class="chart-note"></div>
+                <div class="chart-shell">
+                    <div id="chart-items" class="pie-chart"></div>
+                    <div id="items-legend" class="legend-grid"></div>
+                </div>
+            </article>
+
+            <article class="chart-box wide">
+                <h2>Selected Item Price History + 7-day Forecast</h2>
+                <div class="selector-row">
+                    <select id="item-select" onchange="loadChart()"></select>
+                    <select id="region-select" onchange="loadChart()">
+                        <option value="10000002">Jita</option>
+                        <option value="10000043">Amarr</option>
+                        <option value="10000032">Dodixie</option>
+                        <option value="10000042">Hek</option>
+                        <option value="10000030">Rens</option>
+                    </select>
+                    <span class="meta" id="chart-meta"></span>
+                </div>
+                <div id="selected-item-detail" class="item-detail"></div>
+                <div id="chart-price"></div>
+            </article>
+        </section>
+    </main>
 
     <script>
-        const hubLabels     = {{ hub_labels | tojson }};
-        const hubValuesIsk  = {{ hub_values_isk | tojson }};
-        const hubValuesUsd  = {{ hub_values_usd | tojson }};
-        const itemLabels    = {{ item_labels | tojson }};
-        const itemValuesIsk = {{ item_values_isk | tojson }};
-        const itemValuesUsd = {{ item_values_usd | tojson }};
+        const hubLabels = {{ hub_labels | tojson }};
+        const hubValuesIsk = {{ hub_values_isk | tojson }};
+        const hubValuesUsd = {{ hub_values_usd | tojson }};
+        const jitaItems = {{ jita_items | tojson }};
+        const jitaItemCount = {{ jita_item_count | tojson }};
+        const jitaTotalIsk = {{ jita_total_isk | tojson }};
+        const selectorItems = {{ selector_items | tojson }};
+        const fixedPriceTypeIds = new Set({{ fixed_price_type_ids | tojson }});
 
-        const layout = {
-            paper_bgcolor: '#161b22',
-            plot_bgcolor:  '#161b22',
-            font:   { color: '#c9d1d9', size: 12 },
-            margin: { t: 10, b: 10, l: 10, r: 10 },
-            showlegend: true,
-            legend: { orientation: 'v', font: { size: 11 } },
+        const pieColors = [
+            "#58a6ff", "#3fb950", "#f78166", "#d29922", "#a371f7",
+            "#39c5cf", "#ff7b72", "#7ee787", "#ffa657", "#bc8cff",
+            "#79c0ff", "#56d364", "#e3b341", "#db6d28", "#ff9bce",
+            "#1f6feb", "#238636", "#da3633", "#9e6a03", "#8957e5",
+            "#8b949e"
+        ];
+
+        const plotConfig = {
+            responsive: true,
+            displayModeBar: false
         };
+
+        const basePieLayout = {
+            paper_bgcolor: "#161b22",
+            plot_bgcolor: "#161b22",
+            font: { color: "#c9d1d9", size: 12 },
+            margin: { t: 8, b: 8, l: 8, r: 8 },
+            showlegend: false,
+            uniformtext: { mode: "hide", minsize: 10 }
+        };
+
+        function formatNumber(value, digits = 0) {
+            return value.toLocaleString("en-US", {
+                maximumFractionDigits: digits,
+                minimumFractionDigits: digits
+            });
+        }
+
+        function formatCompactIsk(value) {
+            return value.toLocaleString("en-US", {
+                notation: "compact",
+                maximumFractionDigits: 2
+            });
+        }
+
+        function formatShare(value) {
+            return Number(value).toLocaleString("en-US", {
+                maximumFractionDigits: 3,
+                minimumFractionDigits: 3
+            });
+        }
+
+        function getShares(values) {
+            const total = values.reduce((sum, value) => sum + value, 0);
+            return values.map(value => total ? value / total * 100 : 0);
+        }
+
+        function escapeHtml(value) {
+            return String(value)
+                .replaceAll("&", "&amp;")
+                .replaceAll("<", "&lt;")
+                .replaceAll(">", "&gt;")
+                .replaceAll('"', "&quot;")
+                .replaceAll("'", "&#039;");
+        }
 
         function hoverText(iskArr, usdArr) {
             return iskArr.map((isk, i) =>
-                `ISK: ${isk.toLocaleString('en-US', {maximumFractionDigits: 0})}<br>USD: $${usdArr[i].toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`
+                `ISK: ${formatNumber(isk)}<br>USD: $${formatNumber(usdArr[i], 2)}`
             );
         }
 
-        Plotly.newPlot('chart-hubs', [{
-            type: 'pie', labels: hubLabels, values: hubValuesIsk, hole: 0.4,
-            textinfo: 'label+percent',
-            text: hoverText(hubValuesIsk, hubValuesUsd),
-            hovertemplate: '<b>%{label}</b><br>%{text}<extra></extra>',
-            domain: { x: [0.1, 0.9], y: [0, 1] },
-        }], { ...layout, height: 480, autosize: true });
-
-        Plotly.newPlot('chart-items', [{
-            type: 'pie', labels: itemLabels, values: itemValuesIsk, hole: 0.4,
-            textinfo: 'label+percent',
-            textposition: 'outside',
-            text: hoverText(itemValuesIsk, itemValuesUsd),
-            hovertemplate: '<b>%{label}</b><br>%{text}<extra></extra>',
-            domain: { x: [0.0, 1.0], y: [0, 1] },
-        }], {
-            ...layout,
-            height: 520,
-            autosize: true,
-            margin: { t: 40, b: 40, l: 120, r: 120 },
-            showlegend: false,
-        });
-
-        // список товаров справа
-        const colors = ['#636efa','#ef553b','#00cc96','#ab63fa','#ffa15a',
-                        '#19d3f3','#ff6692','#b6e880','#ff97ff','#fecb52',
-                        '#1f77b4','#ff7f0e','#2ca02c','#d62728','#9467bd',
-                        '#8c564b','#e377c2','#7f7f7f','#bcbd22','#17becf'];
-        const legend = document.getElementById('items-legend');
-        legend.innerHTML = itemLabels.map((name, i) =>
-            `<div style="display:flex; align-items:center; gap:6px; margin-bottom:6px;">
-                <div style="width:10px; height:10px; border-radius:2px; background:${colors[i % colors.length]}; flex-shrink:0;"></div>
-                <span style="color:#8b949e;">${name}</span>
-            </div>`
-        ).join('');
-
-        async function loadChart() {
-            const typeId   = document.getElementById('item-select').value;
-            const regionId = document.getElementById('region-select').value;
-            const res = await fetch(`/market/price/${typeId}?region_id=${regionId}`);
-            const d = await res.json();
-
-            const priceLayout = {
-                paper_bgcolor: '#161b22', plot_bgcolor: '#161b22',
-                font: { color: '#c9d1d9', size: 12 },
-                margin: { t: 40, b: 60, l: 70, r: 20 },
-                height: 400,
-                xaxis: { title: 'Date', gridcolor: '#21262d', tickangle: -45 },
-                yaxis: { title: 'Price (ISK)', gridcolor: '#21262d' },
-                legend: { orientation: 'h', y: 1.1 },
-            };
-
-            Plotly.newPlot('chart-price', [
-                {
-                    type: 'scatter', mode: 'lines+markers', name: 'Actual price',
-                    x: d.dates, y: d.values,
-                    line: { color: '#58a6ff', width: 2 }, marker: { size: 4 },
-                    hovertemplate: '%{x}<br>Price: %{y:.4f} ISK<extra></extra>',
-                },
-                {
-                    type: 'scatter', mode: 'lines+markers', name: '7-day forecast',
-                    x: d.forecast_dates, y: d.forecast_values,
-                    line: { color: '#f78166', width: 2, dash: 'dash' },
-                    marker: { size: 6, symbol: 'diamond' },
-                    hovertemplate: '%{x}<br>Forecast: %{y:.4f} ISK<extra></extra>',
-                }
-            ], priceLayout);
-
-            const arrow = d.slope >= 0 ? '↑' : '↓';
-            const color = d.slope >= 0 ? '#3fb950' : '#f78166';
-            document.getElementById('chart-meta').innerHTML =
-                `<span style="color:${color}">${arrow} ${d.slope > 0 ? '+' : ''}${d.slope.toFixed(4)} ISK/day</span>
-                 &nbsp;·&nbsp; R² = ${d.r2} &nbsp;·&nbsp; ${d.dates.length} data points`;
+        function renderLegend(targetId, labels, values, colors, valueFormatter = null) {
+            const shares = getShares(values);
+            const target = document.getElementById(targetId);
+            target.innerHTML = labels.map((name, i) => {
+                const safeName = escapeHtml(name);
+                const suffix = valueFormatter ? ` - ${valueFormatter(values[i])}` : "";
+                return `
+                    <div class="legend-item" title="${safeName}">
+                        <span class="legend-swatch" style="background:${colors[i % colors.length]}"></span>
+                        <span class="legend-name">${safeName}</span>
+                        <span class="legend-share">${formatShare(shares[i])}%${suffix}</span>
+                    </div>
+                `;
+            }).join("");
         }
 
+        function renderPie(targetId, labels, valuesIsk, valuesUsd, options = {}) {
+            const colors = options.colors || pieColors;
+            const shares = getShares(valuesIsk);
+            const customData = valuesUsd.map((usd, i) => [usd, shares[i]]);
+            const trace = {
+                type: "pie",
+                labels,
+                values: valuesIsk,
+                ids: options.ids || labels,
+                hole: 0.42,
+                sort: false,
+                direction: "clockwise",
+                marker: {
+                    colors,
+                    line: { color: "#161b22", width: 2 }
+                },
+                textinfo: options.textinfo || "percent",
+                textposition: "inside",
+                insidetextorientation: "radial",
+                textfont: { color: "#ffffff", size: 11 },
+                customdata: customData,
+                hovertext: hoverText(valuesIsk, valuesUsd),
+                hovertemplate: "<b>%{label}</b><br>%{hovertext}<br>Share: %{customdata[1]:.3f}%<extra></extra>"
+            };
+
+            if (trace.textinfo !== "none") {
+                trace.texttemplate = trace.textinfo === "label+percent"
+                    ? "%{label}<br>%{customdata[1]:.3f}%"
+                    : "%{customdata[1]:.3f}%";
+            }
+
+            return Plotly.newPlot(targetId, [trace], {
+                ...basePieLayout,
+                height: options.height || 430,
+                annotations: options.centerLabel ? [{
+                    text: options.centerLabel,
+                    showarrow: false,
+                    font: { color: "#8b949e", size: 12 },
+                    x: 0.5,
+                    y: 0.5
+                }] : []
+            }, plotConfig);
+        }
+
+        function populateItemSelector() {
+            const select = document.getElementById("item-select");
+            select.innerHTML = selectorItems.map(item => {
+                const label = `${item.name} - ${formatCompactIsk(item.isk)} ISK - ${formatShare(item.share)}%${item.is_fixed_price ? " - FIXED" : ""}`;
+                const fixedStyle = item.is_fixed_price ? ' style="color:#ffa657;"' : "";
+                return `<option value="${item.type_id}"${fixedStyle}>${escapeHtml(label)}</option>`;
+            }).join("");
+        }
+
+        function getSelectedItem() {
+            const typeId = Number(document.getElementById("item-select").value);
+            return selectorItems.find(item => item.type_id === typeId) || null;
+        }
+
+        function selectPriceItem(typeId) {
+            const select = document.getElementById("item-select");
+            const option = Array.from(select.options).find(item => Number(item.value) === Number(typeId));
+            if (!option) {
+                return;
+            }
+            select.value = String(typeId);
+            loadChart();
+            document.getElementById("chart-price").scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+
+        renderPie("chart-hubs", hubLabels, hubValuesIsk, hubValuesUsd, {
+            colors: pieColors,
+            textinfo: "label+percent",
+            centerLabel: "Hubs"
+        });
+        renderLegend("hubs-legend", hubLabels, hubValuesIsk, pieColors);
+
+        function getJitaPieData() {
+            const mode = document.getElementById("jita-mode-select").value;
+            const topCountInput = document.getElementById("jita-top-count");
+            const otherToggle = document.getElementById("jita-other-toggle");
+            topCountInput.max = String(jitaItemCount);
+
+            const requestedLimit = Math.max(1, Math.min(Number(topCountInput.value || 100), jitaItemCount));
+            const includeOther = otherToggle.checked && mode !== "all";
+            const limit = mode === "all" ? jitaItems.length : requestedLimit;
+            const visibleItems = jitaItems.slice(0, limit);
+            const hiddenItems = jitaItems.slice(limit);
+
+            const labels = visibleItems.map(item => item.name);
+            const valuesIsk = visibleItems.map(item => item.isk);
+            const valuesUsd = visibleItems.map(item => item.usd);
+            const ids = visibleItems.map(item => String(item.type_id));
+
+            if (includeOther && hiddenItems.length > 0) {
+                const otherIsk = hiddenItems.reduce((sum, item) => sum + item.isk, 0);
+                const otherUsd = hiddenItems.reduce((sum, item) => sum + item.usd, 0);
+                labels.push("Other");
+                valuesIsk.push(otherIsk);
+                valuesUsd.push(otherUsd);
+                ids.push("");
+            }
+
+            const colors = labels.map((label, i) =>
+                label === "Other" ? "#8b949e" : pieColors[i % (pieColors.length - 1)]
+            );
+
+            return { labels, valuesIsk, valuesUsd, ids, colors, mode, limit, includeOther, hiddenCount: hiddenItems.length };
+        }
+
+        function bindItemsChartClick() {
+            const chart = document.getElementById("chart-items");
+            if (chart.removeAllListeners) {
+                chart.removeAllListeners("plotly_click");
+            }
+            chart.on("plotly_click", event => {
+                const point = event.points && event.points[0];
+                const typeId = point && point.id;
+                if (!typeId) {
+                    return;
+                }
+                selectPriceItem(typeId);
+            });
+        }
+
+        function renderJitaItemsPie() {
+            const data = getJitaPieData();
+            const mode = document.getElementById("jita-mode-select").value;
+            const topCountInput = document.getElementById("jita-top-count");
+            const otherToggle = document.getElementById("jita-other-toggle");
+            topCountInput.disabled = mode === "all";
+            otherToggle.disabled = mode === "all";
+
+            const title = mode === "all"
+                ? "All Items by Turnover in Jita"
+                : `Top ${data.limit} Items by Turnover in Jita${data.includeOther ? " + Other" : ""}`;
+            document.getElementById("items-chart-title").textContent = title;
+
+            const shownCount = mode === "all" ? jitaItemCount : Math.min(data.limit, jitaItemCount);
+            const otherText = data.includeOther && data.hiddenCount > 0 ? ` + Other (${data.hiddenCount} items)` : "";
+            document.getElementById("items-chart-note").textContent =
+                `Showing ${shownCount} of ${jitaItemCount} tracked Jita items${otherText}. Click a sector to inspect price history. Total turnover: ${formatCompactIsk(jitaTotalIsk)} ISK.`;
+
+            renderPie("chart-items", data.labels, data.valuesIsk, data.valuesUsd, {
+                colors: data.colors,
+                ids: data.ids,
+                textinfo: mode === "all" ? "none" : "percent",
+                centerLabel: "Jita"
+            }).then(bindItemsChartClick);
+            renderLegend("items-legend", data.labels, data.valuesIsk, data.colors, formatCompactIsk);
+        }
+
+        async function loadChart() {
+            const typeId = document.getElementById("item-select").value;
+            const regionId = document.getElementById("region-select").value;
+            const selectedItem = getSelectedItem();
+            const detail = selectedItem
+                ? `${selectedItem.name} - ${formatCompactIsk(selectedItem.isk)} ISK turnover - ${formatShare(selectedItem.share)}% of tracked Jita turnover`
+                : "";
+
+            const res = await fetch(`/market/price/${typeId}?region_id=${regionId}`);
+            const d = await res.json();
+            const isFixedPrice = Boolean(d.is_fixed_price);
+            const isKnownFixedItem = selectedItem?.is_fixed_price || fixedPriceTypeIds.has(Number(typeId));
+            const itemColor = isFixedPrice ? "#ffa657" : "#58a6ff";
+
+            document.getElementById("selected-item-detail").innerHTML =
+                `${escapeHtml(detail)} ${isFixedPrice ? '<span class="fixed-badge">FIXED PRICE IN THIS REGION</span>' : ""}${!isFixedPrice && isKnownFixedItem ? '<span class="fixed-badge">KNOWN FIXED ITEM</span>' : ""}`;
+
+            if (!d.dates.length) {
+                Plotly.newPlot("chart-price", [], {
+                    paper_bgcolor: "#161b22",
+                    plot_bgcolor: "#161b22",
+                    font: { color: "#c9d1d9", size: 12 },
+                    height: 420,
+                    xaxis: { visible: false },
+                    yaxis: { visible: false },
+                    annotations: [{
+                        text: "No market history for this item in the selected region",
+                        showarrow: false,
+                        font: { color: "#8b949e", size: 13 },
+                        x: 0.5,
+                        y: 0.5
+                    }]
+                }, plotConfig);
+                document.getElementById("chart-meta").innerHTML =
+                    `${isFixedPrice ? '<span class="fixed-badge">FIXED</span>&nbsp;' : ""}No data`;
+                return;
+            }
+
+            const priceLayout = {
+                paper_bgcolor: "#161b22",
+                plot_bgcolor: "#161b22",
+                font: { color: "#c9d1d9", size: 12 },
+                margin: { t: 36, b: 64, l: 74, r: 18 },
+                height: 420,
+                xaxis: { title: "Date", gridcolor: "#21262d", tickangle: -45, automargin: true },
+                yaxis: { title: "Price (ISK)", gridcolor: "#21262d", automargin: true },
+                legend: { orientation: "h", y: 1.12, x: 0 },
+            };
+
+            Plotly.newPlot("chart-price", [
+                {
+                    type: "scatter",
+                    mode: "lines+markers",
+                    name: "Actual price",
+                    x: d.dates,
+                    y: d.values,
+                    line: { color: itemColor, width: 2 },
+                    marker: { size: 4 },
+                    hovertemplate: "%{x}<br>Price: %{y:.4f} ISK<extra></extra>",
+                },
+                {
+                    type: "scatter",
+                    mode: "lines+markers",
+                    name: "7-day forecast",
+                    x: d.forecast_dates,
+                    y: d.forecast_values,
+                    line: { color: "#f78166", width: 2, dash: "dash" },
+                    marker: { size: 6, symbol: "diamond" },
+                    hovertemplate: "%{x}<br>Forecast: %{y:.4f} ISK<extra></extra>",
+                }
+            ], priceLayout, plotConfig);
+
+            const trend = d.slope >= 0 ? "up" : "down";
+            const color = d.slope >= 0 ? "#3fb950" : "#f78166";
+            document.getElementById("chart-meta").innerHTML =
+                `${isFixedPrice ? '<span class="fixed-badge">FIXED</span>&nbsp;' : ""}
+                 <span style="color:${color}">${trend} ${d.slope > 0 ? "+" : ""}${d.slope.toFixed(4)} ISK/day</span>
+                 &nbsp;|&nbsp; R2 = ${d.r2} &nbsp;|&nbsp; ${d.dates.length} data points`;
+        }
+
+        window.addEventListener("resize", () => {
+            Plotly.Plots.resize(document.getElementById("chart-hubs"));
+            Plotly.Plots.resize(document.getElementById("chart-items"));
+            Plotly.Plots.resize(document.getElementById("chart-price"));
+        });
+
+        populateItemSelector();
+        renderJitaItemsPie();
         loadChart();
     </script>
 </body>

@@ -1,0 +1,106 @@
+﻿[2026-04-15 21:10:05] ============================================================
+[2026-04-15 21:10:05] Scheduled DB update started. Idle at start: 0 minutes.
+[2026-04-15 21:10:05] Checking PostgreSQL status...
+[2026-04-15 21:10:05] ERROR: You cannot call a method on a null-valued expression.
+[2026-04-15 21:10:05] Scheduled DB update script ended.
+[2026-04-15 21:10:24] ============================================================
+[2026-04-15 21:10:24] Scheduled DB update started. Idle at start: 0 minutes.
+[2026-04-15 21:10:24] Checking PostgreSQL status...
+pg_ctl: no server running
+[2026-04-15 21:10:24] PostgreSQL is not running. Starting...
+pg_ctl: another server might be running; trying to start server anyway
+pg_ctl: could not create restricted token: error code 87
+pg_ctl: could not start server: error code 87
+127.0.0.1:5432 - accepting connections
+[2026-04-15 21:10:24] PostgreSQL is accepting connections.
+[2026-04-15 21:10:24] Running incremental ESI history update...
+2026-04-15 21:10:25 [INFO] Loading existing market_history state from DB...
+2026-04-15 21:10:25 [INFO] ============================================================
+2026-04-15 21:10:25 [INFO] FluxEV Engine - Historical Data Fetcher
+2026-04-15 21:10:25 [INFO] ============================================================
+2026-04-15 21:10:25 [INFO] Mode             : incremental
+2026-04-15 21:10:25 [INFO] Items loaded     : 1000
+2026-04-15 21:10:25 [INFO] Regions          : Jita, Amarr, Dodixie, Hek, Rens
+2026-04-15 21:10:25 [INFO] Period           : last 30 days (since 2026-03-16)
+2026-04-15 21:10:25 [INFO] Fresh after      : 2026-04-13 (incremental skip threshold)
+2026-04-15 21:10:25 [INFO] Concurrency      : 15
+2026-04-15 21:10:25 [INFO] Max pairs        : 10
+2026-04-15 21:10:25 [INFO] Pairs skipped    : 3706 (already fresh)
+2026-04-15 21:10:25 [INFO] Total API calls  : ~10
+2026-04-15 21:10:25 [INFO] ------------------------------------------------------------
+2026-04-15 21:10:25 [INFO] Dry run complete: no ESI requests were made and DB was not changed.
+[2026-04-15 21:10:25] Scheduled DB update finished successfully.
+[2026-04-15 21:10:25] NoSleep flag is set. Leaving computer awake.
+[2026-04-15 21:10:25] Scheduled DB update script ended.
+[2026-04-15 21:11:00] ============================================================
+[2026-04-15 21:11:00] Scheduled DB update started. Idle at start: 0 minutes.
+[2026-04-15 21:11:00] Checking PostgreSQL readiness...
+127.0.0.1:5432 - accepting connections
+[2026-04-15 21:11:00] PostgreSQL is already accepting connections.
+[2026-04-15 21:11:00] Running incremental ESI history update...
+2026-04-15 21:11:01 [INFO] Loading existing market_history state from DB...
+2026-04-15 21:11:01 [INFO] ============================================================
+2026-04-15 21:11:01 [INFO] FluxEV Engine - Historical Data Fetcher
+2026-04-15 21:11:01 [INFO] ============================================================
+2026-04-15 21:11:01 [INFO] Mode             : incremental
+2026-04-15 21:11:01 [INFO] Items loaded     : 1000
+2026-04-15 21:11:01 [INFO] Regions          : Jita, Amarr, Dodixie, Hek, Rens
+2026-04-15 21:11:01 [INFO] Period           : last 30 days (since 2026-03-16)
+2026-04-15 21:11:01 [INFO] Fresh after      : 2026-04-13 (incremental skip threshold)
+2026-04-15 21:11:01 [INFO] Concurrency      : 15
+2026-04-15 21:11:01 [INFO] Max pairs        : 10
+2026-04-15 21:11:01 [INFO] Pairs skipped    : 3706 (already fresh)
+2026-04-15 21:11:01 [INFO] Total API calls  : ~10
+2026-04-15 21:11:01 [INFO] ------------------------------------------------------------
+2026-04-15 21:11:01 [INFO] Dry run complete: no ESI requests were made and DB was not changed.
+[2026-04-15 21:11:01] Scheduled DB update finished successfully.
+[2026-04-15 21:11:01] NoSleep flag is set. Leaving computer awake.
+[2026-04-15 21:11:01] Scheduled DB update script ended.
+[2026-04-15 21:19:33] ============================================================
+[2026-04-15 21:19:33] Scheduled DB update started. Idle at start: 0 minutes.
+[2026-04-15 21:19:33] Checking PostgreSQL readiness...
+127.0.0.1:5432 - accepting connections
+[2026-04-15 21:19:33] PostgreSQL is already accepting connections.
+[2026-04-15 21:19:33] Running incremental ESI history update...
+2026-04-15 21:19:33 [INFO] Loading existing market_history state from DB...
+2026-04-15 21:19:34 [INFO] ============================================================
+2026-04-15 21:19:34 [INFO] FluxEV Engine - Historical Data Fetcher
+2026-04-15 21:19:34 [INFO] ============================================================
+2026-04-15 21:19:34 [INFO] Mode             : incremental
+2026-04-15 21:19:34 [INFO] Items loaded     : 1000
+2026-04-15 21:19:34 [INFO] Regions          : Jita, Amarr, Dodixie, Hek, Rens
+2026-04-15 21:19:34 [INFO] Period           : last 30 days (since 2026-03-16)
+2026-04-15 21:19:34 [INFO] Fresh after      : 2026-04-13 (incremental skip threshold)
+2026-04-15 21:19:34 [INFO] Concurrency      : 15
+2026-04-15 21:19:34 [INFO] Max pairs        : all
+2026-04-15 21:19:34 [INFO] Pairs skipped    : 3706 (already fresh)
+2026-04-15 21:19:34 [INFO] Total API calls  : ~1294
+2026-04-15 21:19:34 [INFO] ------------------------------------------------------------
+2026-04-15 21:19:34 [INFO] Progress: 100/1294 API calls | saved 0 | skipped 795 | empty 1
+2026-04-15 21:19:35 [INFO] Progress: 200/1294 API calls | saved 0 | skipped 1352 | empty 2
+2026-04-15 21:19:36 [INFO] Progress: 300/1294 API calls | saved 0 | skipped 1804 | empty 5
+2026-04-15 21:19:36 [INFO] Progress: 400/1294 API calls | saved 0 | skipped 2246 | empty 14
+2026-04-15 21:19:37 [INFO] Progress: 500/1294 API calls | saved 0 | skipped 2591 | empty 19
+2026-04-15 21:19:37 [INFO] Progress: 600/1294 API calls | saved 0 | skipped 3161 | empty 23
+2026-04-15 21:19:38 [INFO] Progress: 700/1294 API calls | saved 0 | skipped 3405 | empty 28
+2026-04-15 21:19:38 [INFO] Progress: 800/1294 API calls | saved 0 | skipped 3734 | empty 30
+2026-04-15 21:19:39 [INFO] Progress: 900/1294 API calls | saved 0 | skipped 4124 | empty 40
+2026-04-15 21:19:39 [INFO] Progress: 1000/1294 API calls | saved 0 | skipped 4640 | empty 51
+2026-04-15 21:19:40 [INFO] Progress: 1100/1294 API calls | saved 0 | skipped 4860 | empty 61
+2026-04-15 21:19:40 [INFO] Progress: 1200/1294 API calls | saved 0 | skipped 5094 | empty 79
+2026-04-15 21:19:41 [INFO]   Jita       saved:     0 rows | skipped:    123 | empty:   0
+2026-04-15 21:19:41 [INFO]   Amarr      saved:     0 rows | skipped:   1296 | empty:   2
+2026-04-15 21:19:41 [INFO]   Dodixie    saved:     0 rows | skipped:   1128 | empty:  17
+2026-04-15 21:19:41 [INFO]   Hek        saved:     0 rows | skipped:   1345 | empty:  20
+2026-04-15 21:19:41 [INFO]   Rens       saved:     0 rows | skipped:   1438 | empty:  61
+2026-04-15 21:19:41 [INFO] ------------------------------------------------------------
+2026-04-15 21:19:41 [INFO] Total new rows saved : 0
+2026-04-15 21:19:41 [INFO] Total rows skipped   : 5330 (already in DB)
+2026-04-15 21:19:41 [INFO] Fresh pairs skipped  : 3706 (no ESI call)
+2026-04-15 21:19:41 [INFO] Empty ESI responses  : 100
+2026-04-15 21:19:41 [INFO] Total time           : 7.3s
+2026-04-15 21:19:41 [INFO] ============================================================
+[2026-04-15 21:19:41] Scheduled DB update finished successfully.
+[2026-04-15 21:19:41] Waiting 60 seconds before sleep check...
+[2026-04-15 21:20:41] User active, idle only 0 minutes. Not sleeping.
+[2026-04-15 21:20:41] Scheduled DB update script ended.

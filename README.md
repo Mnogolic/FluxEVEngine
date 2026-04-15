@@ -177,6 +177,18 @@ http://localhost:8000/docs
 .venv\Scripts\python.exe -m scripts.fetch_history
 ```
 
+Быстрое догоняющее обновление без запросов по уже свежим парам товар/регион:
+
+```bash
+.venv\Scripts\python.exe -m scripts.fetch_history --incremental
+```
+
+Проверить, сколько ESI-запросов будет сделано, без реального запуска:
+
+```bash
+.venv\Scripts\python.exe -m scripts.fetch_history --incremental --dry-run
+```
+
 Пример вывода:
 ```
 2026-04-11 21:05:00 [INFO] Items to process : 100

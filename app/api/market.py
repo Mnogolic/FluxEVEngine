@@ -35,10 +35,19 @@ async def get_price_chart(type_id: int, region_id: int = 10000002, db: AsyncSess
     )).all()
 
     if not rows:
-        return {"dates": [], "values": [], "forecast_dates": [], "forecast_values": [], "slope": 0, "r2": 0}
+        return {
+            "dates": [],
+            "values": [],
+            "forecast_dates": [],
+            "forecast_values": [],
+            "slope": 0,
+            "r2": 0,
+            "is_fixed_price": False,
+        }
 
     dates = [r.date.strftime("%Y-%m-%d") for r in rows]
     values = [r.average for r in rows]
+    is_fixed_price = len(set(values)) == 1
 
     forecast_dates, forecast_values, slope, r2 = [], [], 0.0, 0.0
 
@@ -65,4 +74,5 @@ async def get_price_chart(type_id: int, region_id: int = 10000002, db: AsyncSess
         "forecast_values": forecast_values,
         "slope": round(slope, 6),
         "r2": r2,
+        "is_fixed_price": is_fixed_price,
     }
