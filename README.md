@@ -34,8 +34,8 @@
   - Торговый оборот по хабам (ISK + USD при наведении)
   - Топ 20 товаров по обороту в Jita
   - История цен + прогноз на 7 дней (выбор товара и региона)
-- Линейная регрессия с метриками R², MAE, slope (ISK/день)
-- Конвертация ISK → USD через актуальный курс PLEX
+- Линейная регрессия с метриками R2, MAE, slope (ISK/день)
+- Конвертация ISK -> USD через актуальный курс PLEX
 - REST API с документацией Swagger UI
 
 ---
@@ -46,10 +46,10 @@
 FluxEVEngine/
 ├── app/
 │   ├── api/
-│   │   ├── dashboard.py      # GET / — дашборд с графиками
+│   │   ├── dashboard.py      # GET / - дашборд с графиками
 │   │   └── market.py         # GET /market/items, /market/history, /market/price
 │   ├── collector/
-│   │   └── scheduler.py      # APScheduler — сбор данных каждый день в 01:00
+│   │   └── scheduler.py      # APScheduler - сбор данных каждый день в 01:00
 │   ├── core/
 │   │   └── config.py         # настройки из .env
 │   ├── db/
@@ -127,7 +127,7 @@ CREATE DATABASE fluxev OWNER fluxev;
 & "H:\PostSQl\bin\pg_ctl.exe" start -D "H:\PostSQl\data"
 ```
 
-> PostgreSQL не запускается автоматически — нужно запускать вручную каждый раз.
+> PostgreSQL не запускается автоматически - нужно запускать вручную каждый раз.
 
 ### 2. Запустить сервер
 
@@ -161,7 +161,7 @@ http://localhost:8000/docs
 
 Пример вывода:
 ```
-2026-04-11 21:00:01 [INFO] FluxEV Engine — Market Data Collector
+2026-04-11 21:00:01 [INFO] FluxEV Engine - Market Data Collector
 2026-04-11 21:00:01 [INFO] Tracked items loaded: 1000
 2026-04-11 21:00:01 [INFO] Total API requests to make: 5000
 2026-04-11 21:00:45 [INFO] Collection completed in 44.2 seconds
@@ -209,10 +209,10 @@ http://localhost:8000/docs
 ========================================================================
   Region: Jita | Top 10 items | Forecast: +7 days
 ========================================================================
-  Item                             Trend       R²          MAE       Now         7d    Pts
-  Tritanium                    ↑  +0.0021  0.847         0.12      3.89       3.90    30
-  Pyerite                      ↓  -0.0015  0.761         0.08      5.12       5.11    30
-  Mexallon                     ↑  +0.0180  0.923         0.31     18.45      18.58    28
+  Item                             Trend         R2         MAE       Now         7d    Pts
+  Tritanium                    up            0.847        0.12      3.89       3.90    30
+  Pyerite                      down          0.761        0.08      5.12       5.11    30
+  Mexallon                     up            0.923        0.31     18.45      18.58    28
 ```
 
 ### Оборот в ISK и USD
@@ -223,7 +223,7 @@ http://localhost:8000/docs
 
 Пример вывода:
 ```
-PLEX price: 6,120,000 ISK  →  1 USD = 153,000,000 ISK
+PLEX price: 6,120,000 ISK  ->  1 USD = 153,000,000 ISK
 
 Hub          ISK                        USD
 ----------------------------------------------------
@@ -248,3 +248,28 @@ TOTAL        25,129,158,435 ISK        $164.23
 | GET | `/market/price/{type_id}` | История + прогноз на 7 дней (JSON) |
 
 Полная документация: `http://localhost:8000/docs`
+
+---
+
+## CI/CD
+
+- `CI` настроен через GitHub Actions в `.github/workflows/ci.yml`.
+- Workflow запускается на `push` в `main`/`master` и на каждый `pull request`.
+- В CI автоматически выполняются:
+  - установка зависимостей;
+  - запуск PostgreSQL 17 в GitHub Actions;
+  - применение миграций `alembic upgrade head`;
+  - проверка, что таблицы созданы;
+  - синтаксическая проверка `python -m compileall`;
+  - smoke test импорта FastAPI-приложения и маршрутов.
+
+- `CD` настроен через GitHub Actions в `.github/workflows/cd.yml`.
+- Workflow запускается при пуше тега формата `v*`, например `v1.0.0`.
+- В CD автоматически собирается ZIP-архив проекта, загружается как artifact и прикладывается к GitHub Release.
+
+Пример выпуска релиза:
+
+```bash
+git tag v1.0.0
+git push origin v1.0.0
+```

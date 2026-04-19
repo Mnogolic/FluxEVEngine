@@ -71,7 +71,7 @@ async def print_metrics():
 
 
 async def main():
-    logger.info("FluxEV Engine — Market Data Collector")
+    logger.info("FluxEV Engine - Market Data Collector")
     logger.info(f"Started at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     logger.info("-" * 60)
 

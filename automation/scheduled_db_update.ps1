@@ -2,6 +2,7 @@ param(
     [int]$IdleThresholdMinutes = 15,
     [int]$SleepCheckDelaySeconds = 60,
     [int]$Concurrency = 15,
+    [int]$FetchTimeoutMinutes = 30,
     [int]$MaxPairs = 0,
     [switch]$DryRun,
     [switch]$NoSleep
@@ -68,7 +69,6 @@ function Invoke-LoggedProcess {
         [string]$WorkingDirectory = $Project,
         [int]$TimeoutSeconds = 0
     )
-
     function Join-ProcessArguments {
         param([string[]]$ArgsToJoin)
         $quoted = foreach ($arg in $ArgsToJoin) {
@@ -88,27 +88,37 @@ function Invoke-LoggedProcess {
     $psi.RedirectStandardOutput = $true
     $psi.RedirectStandardError = $true
     $psi.UseShellExecute = $false
+    $psi.CreateNoWindow = $true
 
     $process = New-Object System.Diagnostics.Process
     $process.StartInfo = $psi
-    [void]$process.Start()
 
-    if ($TimeoutSeconds -gt 0) {
-        if (-not $process.WaitForExit($TimeoutSeconds * 1000)) {
-            try { $process.Kill($true) } catch {}
-            throw "Process timed out after $TimeoutSeconds seconds: $FilePath"
+    try {
+        [void]$process.Start()
+        $stdoutTask = $process.StandardOutput.ReadToEndAsync()
+        $stderrTask = $process.StandardError.ReadToEndAsync()
+
+        if ($TimeoutSeconds -gt 0) {
+            if (-not $process.WaitForExit($TimeoutSeconds * 1000)) {
+                try { $process.Kill($true) } catch {}
+                throw "Process timed out after $TimeoutSeconds seconds: $FilePath"
+            }
+        } else {
+            $process.WaitForExit()
         }
-    } else {
+
         $process.WaitForExit()
+
+        $stdout = $stdoutTask.GetAwaiter().GetResult()
+        $stderr = $stderrTask.GetAwaiter().GetResult()
+
+        if ($stdout) { $stdout.TrimEnd() | Out-File $Log -Append -Encoding utf8 }
+        if ($stderr) { $stderr.TrimEnd() | Out-File $Log -Append -Encoding utf8 }
+
+        return $process.ExitCode
+    } finally {
+        $process.Dispose()
     }
-
-    $stdout = $process.StandardOutput.ReadToEnd()
-    $stderr = $process.StandardError.ReadToEnd()
-
-    if ($stdout) { $stdout.TrimEnd() | Out-File $Log -Append -Encoding utf8 }
-    if ($stderr) { $stderr.TrimEnd() | Out-File $Log -Append -Encoding utf8 }
-
-    return $process.ExitCode
 }
 
 function Test-PostgresReady {
@@ -159,18 +169,56 @@ function Enter-SleepIfIdle {
     }
 }
 
+function Get-LockPid {
+    if (-not (Test-Path $LockFile)) {
+        return $null
+    }
+
+    $raw = (Get-Content -LiteralPath $LockFile -Raw -ErrorAction SilentlyContinue).Trim()
+    if ([string]::IsNullOrWhiteSpace($raw)) {
+        return $null
+    }
+
+    $pidValue = 0
+    if ([int]::TryParse($raw, [ref]$pidValue)) {
+        return $pidValue
+    }
+
+    return $null
+}
+
+function Test-PidRunning {
+    param([int]$PidToCheck)
+
+    if ($PidToCheck -le 0) {
+        return $false
+    }
+
+    return $null -ne (Get-Process -Id $PidToCheck -ErrorAction SilentlyContinue)
+}
+
 if (Test-Path $LockFile) {
     $lockAge = (Get-Date) - (Get-Item $LockFile).LastWriteTime
-    if ($lockAge.TotalHours -lt 6) {
-        Write-Log "Another scheduled update appears to be running. Lock age: $([math]::Round($lockAge.TotalMinutes, 1)) minutes. Exiting."
-        exit 0
+    $lockPid = Get-LockPid
+
+    if ($lockPid -and (Test-PidRunning -PidToCheck $lockPid)) {
+        if ($lockAge.TotalHours -lt 6) {
+            Write-Log "Another scheduled update appears to be running (PID $lockPid). Lock age: $([math]::Round($lockAge.TotalMinutes, 1)) minutes. Exiting."
+            exit 0
+        }
+        Write-Log "Removing stale lock file for long-running PID $lockPid. Lock age: $([math]::Round($lockAge.TotalHours, 1)) hours."
+    } elseif ($lockPid) {
+        Write-Log "Removing stale lock file for exited PID $lockPid. Lock age: $([math]::Round($lockAge.TotalMinutes, 1)) minutes."
+    } elseif ($lockAge.TotalHours -lt 6) {
+        Write-Log "Removing stale lock file with no PID information. Lock age: $([math]::Round($lockAge.TotalMinutes, 1)) minutes."
+    } else {
+        Write-Log "Removing stale lock file. Lock age: $([math]::Round($lockAge.TotalHours, 1)) hours."
     }
-    Write-Log "Removing stale lock file. Lock age: $([math]::Round($lockAge.TotalHours, 1)) hours."
     Remove-Item -LiteralPath $LockFile -Force
 }
 
 try {
-    New-Item -ItemType File -Force -Path $LockFile | Out-Null
+    Set-Content -LiteralPath $LockFile -Value $PID -Encoding ascii
 
     Set-Location $Project
     $idleAtStart = Get-IdleMinutes
@@ -191,7 +239,8 @@ try {
     $updateExitCode = Invoke-LoggedProcess `
         -FilePath $Python `
         -ArgumentList $fetchArgs `
-        -WorkingDirectory $Project
+        -WorkingDirectory $Project `
+        -TimeoutSeconds ($FetchTimeoutMinutes * 60)
 
     if ($updateExitCode -ne 0) {
         throw "History update failed with exit code $updateExitCode."

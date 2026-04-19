@@ -32,7 +32,7 @@ async def get_plex_isk() -> float:
 async def main():
     plex_isk = await get_plex_isk()
     isk_per_usd = (PLEX_PER_PACK * plex_isk) / PLEX_PACK_USD
-    print(f"PLEX price: {plex_isk:,.0f} ISK  →  1 USD = {isk_per_usd:,.0f} ISK\n")
+    print(f"PLEX price: {plex_isk:,.0f} ISK  ->  1 USD = {isk_per_usd:,.0f} ISK\n")
 
     async with SessionLocal() as db:
         rows = (await db.execute(

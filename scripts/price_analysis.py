@@ -60,7 +60,7 @@ async def analyze_region(db, region_id: int, region_name: str):
     print(f"\n{'='*72}")
     print(f"  Region: {region_name} | Top 10 items | Forecast: +7 days")
     print(f"{'='*72}")
-    print(f"  {'Item':<32} {'Trend':>10} {'R²':>6} {'MAE':>12} {'Now':>10} {'7d':>10} {'Pts':>5}")
+    print(f"  {'Item':<32} {'Trend':>10} {'R2':>6} {'MAE':>12} {'Now':>10} {'7d':>10} {'Pts':>5}")
     print(f"  {'-'*70}")
 
     for r in top_raw:
@@ -83,16 +83,16 @@ async def analyze_region(db, region_id: int, region_name: str):
         slope, intercept, r2, mae = linear_regression(x, y)
         forecast = slope * (x[-1] + 7) + intercept
         current = y[-1]
-        arrow = "↑" if slope > 0 else "↓"
+        trend = "up" if slope > 0 else "down"
 
-        print(f"  {name[:31]:<32} {arrow}{slope:>+9.4f} {r2:>6.3f} {mae:>12.2f} {current:>10.2f} {forecast:>10.2f} {cnt:>5}")
+        print(f"  {name[:31]:<32} {trend:<10} {r2:>6.3f} {mae:>12.2f} {current:>10.2f} {forecast:>10.2f} {cnt:>5}")
 
     print(f"{'='*72}")
 
 
 async def main():
     logger.info("=" * 60)
-    logger.info("FluxEV Engine — Price Trend Analysis (Linear Regression)")
+    logger.info("FluxEV Engine - Price Trend Analysis (Linear Regression)")
     logger.info("=" * 60)
 
     async with SessionLocal() as db:

@@ -92,7 +92,7 @@ async def main():
 
     print(f"Done! Saved {len(items)} items to tracked_items.")
     for item in items[:10]:
-        print(f"  #{items.index(item)+1} {item['name']} (type_id={item['type_id']}) — volume: {item['volume']:,}")
+        print(f"  #{items.index(item)+1} {item['name']} (type_id={item['type_id']}) - volume: {item['volume']:,}")
 
 
 if __name__ == "__main__":
