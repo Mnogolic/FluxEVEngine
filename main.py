@@ -1,4 +1,5 @@
 from contextlib import asynccontextmanager
+from pathlib import Path
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from app.esi.client import esi
@@ -18,4 +19,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(title="FluxEVEngine", lifespan=lifespan)
 app.include_router(market_router)
 app.include_router(dashboard_router)
-app.mount("/static", StaticFiles(directory="static"), name="static")
+
+static_dir = Path(__file__).resolve().parent / "static"
+if static_dir.is_dir():
+    app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
