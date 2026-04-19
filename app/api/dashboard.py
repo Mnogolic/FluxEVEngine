@@ -30,6 +30,11 @@ FIXED_PRICE_TYPE_IDS = {92149, 60459}
 
 
 async def get_plex_price_isk() -> float:
+    """Fetch the current minimum Jita sell price for one PLEX unit.
+
+    Returns a conservative fallback value if the remote request fails or
+    the ESI response is empty.
+    """
     try:
         async with aiohttp.ClientSession() as session:
             async with session.get(
@@ -45,6 +50,7 @@ async def get_plex_price_isk() -> float:
 
 
 def item_payload(row, isk_per_usd: float, total_isk: float, fixed: bool = False) -> dict:
+    """Convert an aggregated SQL row into a dashboard payload dictionary."""
     isk = float(row.isk_total)
     return {
         "type_id": row.type_id,
@@ -58,6 +64,7 @@ def item_payload(row, isk_per_usd: float, total_isk: float, fixed: bool = False)
 
 @router.get("/", response_class=HTMLResponse)
 async def dashboard(request: Request, db: AsyncSession = Depends(get_db)):
+    """Render the main dashboard with turnover charts and item selector data."""
     plex_isk = await get_plex_price_isk()
     isk_per_usd = (PLEX_PER_PACK * plex_isk) / PLEX_PACK_USD
 

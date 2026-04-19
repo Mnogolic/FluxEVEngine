@@ -78,7 +78,13 @@ FluxEVEngine/
 
 ## Переменные окружения (.env)
 
-Создать файл `.env` в корне проекта:
+Скопировать шаблон `.env.example` в `.env` и при необходимости изменить значения:
+
+```
+copy .env.example .env
+```
+
+Содержимое `.env.example`:
 
 ```
 DATABASE_URL=postgresql+asyncpg://fluxev:<password>@localhost:5432/fluxev
@@ -96,21 +102,24 @@ python -m venv .venv
 # 2. Установить зависимости
 .venv\Scripts\pip.exe install -r requirements.txt
 
-# 3. Создать БД и пользователя в PostgreSQL
+# 3. Создать .env из шаблона
+copy .env.example .env
+
+# 4. Создать БД и пользователя в PostgreSQL
 # (выполнить в psql от имени postgres)
 CREATE USER fluxev WITH PASSWORD '<password>';
 CREATE DATABASE fluxev OWNER fluxev;
 
-# 4. Применить миграции (создать таблицы)
+# 5. Применить миграции (создать таблицы)
 .venv\Scripts\alembic.exe upgrade head
 
-# 5. Заполнить топ 1000 товаров (одноразово)
+# 6. Заполнить топ 1000 товаров (одноразово)
 .venv\Scripts\python.exe -m scripts.seed_top_items
 
-# 6. Собрать 30-дневную историю цен
+# 7. Собрать 30-дневную историю цен
 .venv\Scripts\python.exe -m scripts.fetch_history
 
-# 7. Запустить сервер
+# 8. Запустить сервер
 .venv\Scripts\uvicorn.exe main:app --reload
 ```
 

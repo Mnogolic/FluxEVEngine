@@ -11,12 +11,14 @@ router = APIRouter(prefix="/market", tags=["market"])
 
 @router.get("/items")
 async def list_tracked_items(db: AsyncSession = Depends(get_db)):
+    """Return the full tracked item list ordered by item name."""
     result = await db.execute(select(TrackedItem).order_by(TrackedItem.name))
     return result.scalars().all()
 
 
 @router.get("/history/{type_id}")
 async def get_history(type_id: int, region_id: int = 10000002, db: AsyncSession = Depends(get_db)):
+    """Return up to 30 latest historical price rows for one item and region."""
     result = await db.execute(
         select(MarketHistory)
         .where(MarketHistory.type_id == type_id, MarketHistory.region_id == region_id)
@@ -28,6 +30,11 @@ async def get_history(type_id: int, region_id: int = 10000002, db: AsyncSession 
 
 @router.get("/price/{type_id}")
 async def get_price_chart(type_id: int, region_id: int = 10000002, db: AsyncSession = Depends(get_db)):
+    """Return chart-ready price history with a 7-day linear forecast.
+
+    The response includes the historical series, forecasted values, trend
+    slope, coefficient of determination (R2), and a flag for fixed-price items.
+    """
     rows = (await db.execute(
         select(MarketHistory.date, MarketHistory.average)
         .where(MarketHistory.type_id == type_id, MarketHistory.region_id == region_id)

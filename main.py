@@ -10,6 +10,12 @@ from app.api.dashboard import router as dashboard_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    """Manage application startup and shutdown resources.
+
+    Starts the shared ESI HTTP client and background scheduler before the
+    application begins serving requests, then gracefully closes network
+    resources on shutdown.
+    """
     await esi.start()
     start_scheduler()
     yield

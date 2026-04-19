@@ -12,6 +12,7 @@ scheduler = AsyncIOScheduler()
 
 
 async def collect_market_history():
+    """Collect the latest market history rows for all tracked items and hubs."""
     logger.info("Starting market history collection...")
     async with SessionLocal() as session:
         items = (await session.execute(select(TrackedItem))).scalars().all()
@@ -30,6 +31,7 @@ async def collect_market_history():
 
 
 async def _fetch_and_store(type_id: int, region_id: int):
+    """Fetch the newest history row and save it if it is not in the DB yet."""
     try:
         history = await get_market_history(region_id, type_id)
         if not history:
@@ -67,5 +69,6 @@ async def _fetch_and_store(type_id: int, region_id: int):
 
 
 def start_scheduler():
+    """Register and start the daily background market collection job."""
     scheduler.add_job(collect_market_history, "cron", hour=1, minute=0)
     scheduler.start()
