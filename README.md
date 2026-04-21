@@ -250,6 +250,7 @@ TOTAL        25,129,158,435 ISK        $164.23
 
 | Метод | URL | Описание |
 |---|---|---|
+| GET | `/api/dashboard/overview` | Агрегированные данные дашборда для standalone frontend |
 | GET | `/market/items` | Список 1000 отслеживаемых товаров |
 | GET | `/market/history/{type_id}` | История цен по товару |
 | GET | `/market/price/{type_id}` | История + прогноз на 7 дней (JSON) |

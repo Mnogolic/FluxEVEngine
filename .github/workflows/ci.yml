@@ -88,7 +88,12 @@ jobs:
 
           assert main.app.title == "FluxEVEngine"
           paths = {route.path for route in main.app.routes}
-          expected_paths = {"/", "/market/items", "/market/history/{type_id}", "/market/price/{type_id}"}
+          expected_paths = {
+              "/market/items",
+              "/market/history/{type_id}",
+              "/market/price/{type_id}",
+              "/api/dashboard/overview",
+          }
           missing = expected_paths - paths
           if missing:
               raise SystemExit(f"Missing API routes: {sorted(missing)}")
