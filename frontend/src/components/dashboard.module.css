@@ -1,0 +1,405 @@
+.page {
+  width: min(100%, 1480px);
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.title {
+  color: #58a6ff;
+  font-size: 24px;
+  font-weight: 650;
+  line-height: 1.2;
+  margin-bottom: 6px;
+}
+
+.subTitle {
+  color: #8b949e;
+  font-size: 13px;
+  line-height: 1.5;
+  margin-bottom: 24px;
+}
+
+.status {
+  margin-bottom: 16px;
+  border: 1px solid #30363d;
+  border-radius: 8px;
+  background: #161b22;
+  color: #8b949e;
+  font-size: 13px;
+  line-height: 1.5;
+  padding: 14px 16px;
+}
+
+.errorBox {
+  border-color: rgba(248, 81, 73, 0.45);
+  color: #ff7b72;
+}
+
+.retryButton {
+  margin-top: 10px;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  background: #21262d;
+  color: #e6edf3;
+  cursor: pointer;
+  font-size: 13px;
+  padding: 7px 12px;
+}
+
+.charts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.chartBox {
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  border: 1px solid #30363d;
+  border-radius: 8px;
+  background: #161b22;
+  padding: 18px;
+}
+
+.chartBox h2 {
+  color: #c9d1d9;
+  font-size: 15px;
+  font-weight: 650;
+  line-height: 1.35;
+  margin-bottom: 12px;
+}
+
+.chartHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.chartHead h2 {
+  margin-bottom: 0;
+}
+
+.chartControls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.dateRangeControls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.controlLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #8b949e;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.dateInputWrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.dateInput {
+  min-width: 152px;
+  padding-right: 34px;
+}
+
+.clearDateButton {
+  position: absolute;
+  right: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(139, 148, 158, 0.18);
+  color: #c9d1d9;
+  cursor: pointer;
+  font-size: 13px;
+  line-height: 1;
+  padding: 0;
+}
+
+.clearDateButton:hover {
+  background: rgba(88, 166, 255, 0.22);
+  color: #ffffff;
+}
+
+.toggleLabel {
+  cursor: pointer;
+  user-select: none;
+}
+
+.toggleInput {
+  width: 15px;
+  height: 15px;
+  accent-color: #58a6ff;
+}
+
+.chartNote,
+.itemDetail,
+.meta {
+  color: #8b949e;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.chartNote {
+  margin-top: -2px;
+  margin-bottom: 8px;
+}
+
+.itemDetail {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.fixedBadge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 20px;
+  border: 1px solid rgba(255, 166, 87, 0.45);
+  border-radius: 999px;
+  background: rgba(255, 166, 87, 0.12);
+  color: #ffa657;
+  font-size: 11px;
+  font-weight: 650;
+  line-height: 1;
+  padding: 4px 8px;
+}
+
+.chartShell {
+  width: 100%;
+  min-width: 0;
+}
+
+.pieChart {
+  width: 100%;
+  height: 430px;
+}
+
+.legendGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 8px 12px;
+  margin-top: 8px;
+  padding-right: 4px;
+}
+
+.legendDetails {
+  margin-top: 10px;
+  border: 1px solid #30363d;
+  border-radius: 8px;
+  background: #0d1117;
+  overflow: hidden;
+}
+
+.legendSummary {
+  cursor: pointer;
+  color: #c9d1d9;
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.4;
+  list-style: none;
+  padding: 10px 12px;
+  user-select: none;
+}
+
+.legendSummary::-webkit-details-marker {
+  display: none;
+}
+
+.legendSummary::before {
+  content: '▸';
+  color: #58a6ff;
+  margin-right: 8px;
+}
+
+.legendDetails[open] .legendSummary::before {
+  content: '▾';
+}
+
+.legendDetails .legendGrid {
+  margin-top: 0;
+  padding: 0 12px 12px;
+}
+
+.legendItem {
+  display: grid;
+  grid-template-columns: 10px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  color: #8b949e;
+  font-size: 12px;
+  line-height: 1.3;
+  padding: 6px 8px;
+  transition: border-color 0.18s ease, background-color 0.18s ease;
+}
+
+.legendItemActive {
+  border-color: #f7e463;
+  background: rgba(247, 228, 99, 0.12);
+}
+
+.legendSwatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+}
+
+.legendName {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.legendShare {
+  color: #c9d1d9;
+  font-variant-numeric: tabular-nums;
+}
+
+.wide {
+  grid-column: 1 / -1;
+  margin-top: 20px;
+}
+
+.selectorRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.controlSelect,
+.controlNumber {
+  min-width: 220px;
+  max-width: 100%;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  background: #21262d;
+  color: #e6edf3;
+  font-size: 13px;
+  padding: 7px 10px;
+}
+
+.chartControls .controlSelect,
+.chartControls .controlNumber,
+.chartControls .dateInput {
+  min-width: 96px;
+  padding: 6px 9px;
+}
+
+.chartControls .dateInput {
+  min-width: 142px;
+  padding-right: 30px;
+}
+
+.topCountInput {
+  width: 92px;
+}
+
+.itemSelect {
+  flex: 1 1 440px;
+}
+
+.regionSelect {
+  flex: 0 1 180px;
+}
+
+.meta {
+  min-width: 280px;
+}
+
+.chartMeta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.trendUp {
+  color: #3fb950;
+}
+
+.trendDown {
+  color: #f78166;
+}
+
+.priceChart {
+  width: 100%;
+  height: 420px;
+}
+
+@media (max-width: 980px) {
+  .page {
+    padding: 16px;
+  }
+
+  .charts {
+    grid-template-columns: 1fr;
+  }
+
+  .pieChart {
+    height: 380px;
+  }
+
+  .legendGrid {
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  }
+
+  .dateRangeControls {
+    width: 100%;
+  }
+}
+
+@media (max-width: 560px) {
+  .page {
+    padding: 12px;
+  }
+
+  .chartBox {
+    padding: 14px;
+  }
+
+  .pieChart {
+    height: 330px;
+  }
+
+  .legendGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .controlSelect,
+  .dateInput,
+  .itemSelect,
+  .regionSelect,
+  .meta {
+    width: 100%;
+    flex-basis: 100%;
+    min-width: 0;
+  }
+}

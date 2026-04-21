@@ -1,5 +1,5 @@
 import numpy as np
-from datetime import timedelta
+from datetime import date, datetime, time, timedelta
 from fastapi import APIRouter, Depends
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -7,6 +7,16 @@ from app.db.session import get_db
 from app.db.models import TrackedItem, MarketHistory
 
 router = APIRouter(prefix="/market", tags=["market"])
+
+
+def normalize_date_range(
+    date_from: date | None,
+    date_to: date | None,
+) -> tuple[date | None, date | None]:
+    """Return an ordered date range even if the user swapped inputs."""
+    if date_from and date_to and date_from > date_to:
+        return date_to, date_from
+    return date_from, date_to
 
 
 @router.get("/items")
@@ -29,15 +39,28 @@ async def get_history(type_id: int, region_id: int = 10000002, db: AsyncSession 
 
 
 @router.get("/price/{type_id}")
-async def get_price_chart(type_id: int, region_id: int = 10000002, db: AsyncSession = Depends(get_db)):
+async def get_price_chart(
+    type_id: int,
+    region_id: int = 10000002,
+    date_from: date | None = None,
+    date_to: date | None = None,
+    db: AsyncSession = Depends(get_db),
+):
     """Return chart-ready price history with a 7-day linear forecast.
 
     The response includes the historical series, forecasted values, trend
     slope, coefficient of determination (R2), and a flag for fixed-price items.
     """
+    date_from, date_to = normalize_date_range(date_from, date_to)
+    filters = [MarketHistory.type_id == type_id, MarketHistory.region_id == region_id]
+    if date_from:
+        filters.append(MarketHistory.date >= datetime.combine(date_from, time.min))
+    if date_to:
+        filters.append(MarketHistory.date < datetime.combine(date_to + timedelta(days=1), time.min))
+
     rows = (await db.execute(
         select(MarketHistory.date, MarketHistory.average)
-        .where(MarketHistory.type_id == type_id, MarketHistory.region_id == region_id)
+        .where(*filters)
         .order_by(MarketHistory.date.asc())
     )).all()
 

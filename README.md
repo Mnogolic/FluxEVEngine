@@ -46,7 +46,6 @@
 FluxEVEngine/
 ├── app/
 │   ├── api/
-│   │   ├── dashboard.py      # GET / - дашборд с графиками
 │   │   └── market.py         # GET /market/items, /market/history, /market/price
 │   ├── collector/
 │   │   └── scheduler.py      # APScheduler - сбор данных каждый день в 01:00
@@ -67,8 +66,6 @@ FluxEVEngine/
 │   ├── turnover.py           # оборот по регионам в ISK и USD
 │   ├── diagnose.py           # диагностика ESI и БД
 │   └── check_db.py           # статистика строк по датам и регионам
-├── templates/
-│   └── dashboard.html        # HTML дашборд (Plotly.js)
 ├── main.py                   # точка входа FastAPI
 ├── requirements.txt
 └── .env                      # DATABASE_URL и ESI_BASE_URL (не в git)
@@ -120,7 +117,8 @@ CREATE DATABASE fluxev OWNER fluxev;
 .venv\Scripts\python.exe -m scripts.fetch_history
 
 # 8. Запустить сервер
-.venv\Scripts\uvicorn.exe main:app --reload
+bun api
+bun dev
 ```
 
 ---
@@ -143,7 +141,8 @@ CREATE DATABASE fluxev OWNER fluxev;
 В терминале VSCode (`Ctrl+\``):
 
 ```bash
-.venv\Scripts\uvicorn.exe main:app --reload
+bun api
+bun dev
 ```
 
 ### 3. Открыть дашборд
@@ -155,7 +154,7 @@ http://localhost:8000/
 Swagger UI (документация API):
 
 ```
-http://localhost:8000/docs
+http://localhost:8001/docs
 ```
 
 ---
@@ -251,12 +250,11 @@ TOTAL        25,129,158,435 ISK        $164.23
 
 | Метод | URL | Описание |
 |---|---|---|
-| GET | `/` | HTML дашборд |
 | GET | `/market/items` | Список 1000 отслеживаемых товаров |
 | GET | `/market/history/{type_id}` | История цен по товару |
 | GET | `/market/price/{type_id}` | История + прогноз на 7 дней (JSON) |
 
-Полная документация: `http://localhost:8000/docs`
+Полная документация: `http://localhost:8001/docs`
 
 ---
 

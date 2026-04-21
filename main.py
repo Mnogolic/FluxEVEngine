@@ -1,11 +1,10 @@
 from contextlib import asynccontextmanager
-from pathlib import Path
 from fastapi import FastAPI
-from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
 from app.esi.client import esi
 from app.collector.scheduler import start_scheduler
 from app.api.market import router as market_router
-from app.api.dashboard import router as dashboard_router
+from app.api.dashboard_data import router as dashboard_data_router
 
 
 @asynccontextmanager
@@ -23,9 +22,15 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="FluxEVEngine", lifespan=lifespan)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:8000",
+        "http://127.0.0.1:8000",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 app.include_router(market_router)
-app.include_router(dashboard_router)
-
-static_dir = Path(__file__).resolve().parent / "static"
-if static_dir.is_dir():
-    app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
+app.include_router(dashboard_data_router)
