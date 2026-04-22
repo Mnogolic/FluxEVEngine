@@ -92,7 +92,7 @@ async def analyze_region(db, region_id: int, region_name: str):
 
 async def main():
     logger.info("=" * 60)
-    logger.info("FluxEV Engine - Price Trend Analysis (Linear Regression)")
+    logger.info("FluxEVEngine - Price Trend Analysis (Linear Regression)")
     logger.info("=" * 60)
 
     async with SessionLocal() as db:

@@ -1,20 +1,23 @@
 'use client'
 
 import { useRef } from 'react'
+import { getDashboardCopy } from '@/components/dashboard/dashboard-copy'
 import styles from '@/components/dashboard.module.css'
+import type { Locale } from '@/lib/locale'
 import type { DateRangeValue } from '@/types/dashboard'
 
-interface DashboardDateRangeProps {
-  className?: string
+interface DateRangeFieldProps {
+  locale: Locale
   maxDate?: string
   minDate?: string
   onChange: (field: keyof DateRangeValue, value: string) => void
   range: DateRangeValue
 }
 
-interface DashboardDateInputProps {
+interface DateInputFieldProps {
   ariaLabel: string
   clearLabel: string
+  calendarLabel: string
   label: string
   max?: string
   min?: string
@@ -39,15 +42,16 @@ function ClearIcon() {
   )
 }
 
-function DashboardDateInput({
+function DateInputField({
   ariaLabel,
+  calendarLabel,
   clearLabel,
   label,
   max,
   min,
   onChange,
   value
-}: DashboardDateInputProps) {
+}: DateInputFieldProps) {
   const inputRef = useRef<HTMLInputElement | null>(null)
 
   const openPicker = () => {
@@ -87,7 +91,7 @@ function DashboardDateInput({
           </button>
         ) : null}
         <button
-          aria-label={`${label} calendar`}
+          aria-label={calendarLabel}
           className={styles.datePickerButton}
           onClick={openPicker}
           type="button"
@@ -99,28 +103,26 @@ function DashboardDateInput({
   )
 }
 
-export function DashboardDateRange({
-  className,
-  maxDate,
-  minDate,
-  onChange,
-  range
-}: DashboardDateRangeProps) {
+export function DateRangeField({ locale, maxDate, minDate, onChange, range }: DateRangeFieldProps) {
+  const copy = getDashboardCopy(locale)
+
   return (
-    <div className={['flex flex-wrap items-center gap-2.5', className ?? ''].join(' ').trim()}>
-      <DashboardDateInput
-        ariaLabel="Start date"
-        clearLabel="Clear start date"
-        label="From"
+    <div className="flex flex-wrap items-start gap-2.5 self-start">
+      <DateInputField
+        ariaLabel={copy.dateRange.startDate}
+        calendarLabel={copy.dateRange.calendar(copy.dateRange.from)}
+        clearLabel={copy.dateRange.clearStartDate}
+        label={copy.dateRange.from}
         max={range.to || maxDate}
         min={minDate}
         onChange={(value) => onChange('from', value)}
         value={range.from}
       />
-      <DashboardDateInput
-        ariaLabel="End date"
-        clearLabel="Clear end date"
-        label="To"
+      <DateInputField
+        ariaLabel={copy.dateRange.endDate}
+        calendarLabel={copy.dateRange.calendar(copy.dateRange.to)}
+        clearLabel={copy.dateRange.clearEndDate}
+        label={copy.dateRange.to}
         max={maxDate}
         min={range.from || minDate}
         onChange={(value) => onChange('to', value)}

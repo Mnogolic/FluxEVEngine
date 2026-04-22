@@ -1,4 +1,10 @@
-import type { DateRangeValue, MarketForecastResponse, MarketPriceResponse } from '@/types/dashboard'
+import type {
+  DateRangeValue,
+  MarketForecastComparisonResponse,
+  MarketPriceResponse
+} from '@/types/dashboard'
+import { getDashboardCopy } from '@/components/dashboard/dashboard-copy'
+import { getIntlLocale, type Locale } from '@/lib/locale'
 
 export const DEFAULT_REGION_ID = 10000002
 export const OTHER_SLICE_ID = 'other'
@@ -45,57 +51,96 @@ export interface ChartModel {
   layout: Record<string, unknown>
 }
 
+export interface ForecastMethodStyle {
+  color: string
+  dash: 'dash' | 'dot' | 'longdash' | 'solid'
+  label: string
+  markerSymbol: 'diamond' | 'square' | 'triangle-up' | 'circle'
+}
+
+export const FORECAST_METHOD_STYLES: Record<string, ForecastMethodStyle> = {
+  linear: {
+    color: '#f78166',
+    dash: 'dash',
+    label: 'Linear',
+    markerSymbol: 'diamond'
+  },
+  holt_winters: {
+    color: '#3fb950',
+    dash: 'solid',
+    label: 'Holt-Winters',
+    markerSymbol: 'square'
+  },
+  arima: {
+    color: '#d29922',
+    dash: 'dot',
+    label: 'ARIMA',
+    markerSymbol: 'triangle-up'
+  },
+  autoreg: {
+    color: '#a371f7',
+    dash: 'longdash',
+    label: 'AutoReg',
+    markerSymbol: 'circle'
+  }
+}
+
+export const DEFAULT_FORECAST_METHOD_IDS = Object.keys(FORECAST_METHOD_STYLES)
+
 interface PieChartOptions {
   activeId?: string | null
   centerLabel: string
   colors: string[]
   ids?: string[]
   labels: string[]
+  locale: Locale
   textinfo: string
   valuesIsk: number[]
   valuesUsd: number[]
 }
 
-export function formatNumber(value: number, digits: number = 0): string {
-  return value.toLocaleString('en-US', {
+export function formatNumber(value: number, locale: Locale, digits: number = 0): string {
+  return value.toLocaleString(getIntlLocale(locale), {
     maximumFractionDigits: digits,
     minimumFractionDigits: digits
   })
 }
 
-export function formatCompactIsk(value: number): string {
-  return value.toLocaleString('en-US', {
+export function formatCompactIsk(value: number, locale: Locale): string {
+  return value.toLocaleString(getIntlLocale(locale), {
     notation: 'compact',
     maximumFractionDigits: 2
   })
 }
 
-export function formatShare(value: number): string {
-  return Number(value).toLocaleString('en-US', {
+export function formatShare(value: number, locale: Locale): string {
+  return Number(value).toLocaleString(getIntlLocale(locale), {
     maximumFractionDigits: 3,
     minimumFractionDigits: 3
   })
 }
 
-export function getOverviewErrorMessage(error: unknown): string {
-  return error instanceof Error ? error.message : 'Unknown dashboard error'
+export function getOverviewErrorMessage(error: unknown, locale: Locale): string {
+  return error instanceof Error ? error.message : getDashboardCopy(locale).unknownDashboardError
 }
 
-export function getPriceErrorMessage(error: unknown): string {
-  return error instanceof Error ? error.message : 'Unknown price error'
+export function getPriceErrorMessage(error: unknown, locale: Locale): string {
+  return error instanceof Error ? error.message : getDashboardCopy(locale).unknownPriceError
 }
 
-export function getDateRangeLabel(range: DateRangeValue): string {
+export function getDateRangeLabel(range: DateRangeValue, locale: Locale): string {
+  const copy = getDashboardCopy(locale)
+
   if (range.from && range.to) {
-    return range.from === range.to ? range.from : `${range.from} to ${range.to}`
+    return copy.betweenDates(range.from, range.to)
   }
   if (range.from) {
-    return `from ${range.from}`
+    return copy.fromDate(range.from)
   }
   if (range.to) {
-    return `up to ${range.to}`
+    return copy.upToDate(range.to)
   }
-  return 'all available dates'
+  return copy.allAvailableDates
 }
 
 export function updateDateRangeValue(
@@ -178,7 +223,43 @@ export function buildForecastPath(options: {
   return `/market/forecast/${options.typeId}?${params.toString()}`
 }
 
+export function buildForecastComparePath(options: {
+  dateRange: DateRangeValue
+  forecastDays: number
+  methodIds: string[]
+  regionId: number
+  typeId: number
+  validationDays?: number
+}) {
+  const params = new URLSearchParams()
+  params.set('region_id', String(options.regionId))
+  params.set('forecast_days', String(options.forecastDays))
+  params.set('validation_days', String(options.validationDays ?? Math.min(options.forecastDays, 7)))
+  params.set('methods', options.methodIds.join(','))
+
+  if (options.dateRange.from) {
+    params.set('date_from', options.dateRange.from)
+  }
+  if (options.dateRange.to) {
+    params.set('date_to', options.dateRange.to)
+  }
+
+  return `/market/forecast/compare/${options.typeId}?${params.toString()}`
+}
+
+export function getForecastMethodStyle(methodId: string): ForecastMethodStyle {
+  return (
+    FORECAST_METHOD_STYLES[methodId] ?? {
+      color: '#8b949e',
+      dash: 'dash',
+      label: methodId,
+      markerSymbol: 'diamond'
+    }
+  )
+}
+
 export function createPieChartData(options: PieChartOptions): ChartModel {
+  const copy = getDashboardCopy(options.locale)
   const pointIds = options.ids ?? options.labels
   const isActiveSlice = (pointId: string) =>
     options.activeId !== null && options.activeId !== undefined && pointId === options.activeId
@@ -206,8 +287,7 @@ export function createPieChartData(options: PieChartOptions): ChartModel {
         insidetextorientation: 'radial',
         textfont: { color: '#ffffff', size: 11 },
         customdata: options.valuesUsd,
-        hovertemplate:
-          '<b>%{label}</b><br>ISK: %{value:,.0f}<br>USD: $%{customdata:,.2f}<br>Share: %{percent}<extra></extra>',
+        hovertemplate: `<b>%{label}</b><br>ISK: %{value:,.0f}<br>${copy.hoverUsdLabel}: $%{customdata:,.2f}<br>${copy.hoverShareLabel}: %{percent}<extra></extra>`,
         texttemplate:
           options.textinfo === 'label+percent'
             ? '%{label}<br>%{percent}'
@@ -232,7 +312,9 @@ export function createPieChartData(options: PieChartOptions): ChartModel {
   }
 }
 
-export function createOtherPriceChartData(): ChartModel {
+export function createOtherPriceChartData(locale: Locale): ChartModel {
+  const copy = getDashboardCopy(locale)
+
   return {
     data: [],
     layout: {
@@ -244,7 +326,7 @@ export function createOtherPriceChartData(): ChartModel {
       yaxis: { visible: false },
       annotations: [
         {
-          text: 'Other is an aggregate of hidden items and has no single price history',
+          text: copy.otherPriceChartText,
           showarrow: false,
           font: { color: '#8b949e', size: 13 },
           x: 0.5,
@@ -255,13 +337,18 @@ export function createOtherPriceChartData(): ChartModel {
   }
 }
 
-export function createPriceHistoryChartData(priceData: MarketPriceResponse): ChartModel {
+export function createPriceHistoryChartData(
+  priceData: MarketPriceResponse,
+  locale: Locale
+): ChartModel {
+  const copy = getDashboardCopy(locale)
+
   return {
     data: [
       {
         type: 'scatter',
         mode: 'lines+markers',
-        name: 'Actual price',
+        name: copy.traceActualPrice,
         x: priceData.dates,
         y: priceData.values,
         line: {
@@ -269,7 +356,7 @@ export function createPriceHistoryChartData(priceData: MarketPriceResponse): Cha
           width: 2
         },
         marker: { size: 4 },
-        hovertemplate: '%{x}<br>Price: %{y:.4f} ISK<extra></extra>'
+        hovertemplate: `%{x}<br>${copy.hoverPriceLabel}: %{y:.4f} ISK<extra></extra>`
       }
     ],
     layout: {
@@ -279,23 +366,28 @@ export function createPriceHistoryChartData(priceData: MarketPriceResponse): Cha
       margin: { t: 36, b: 64, l: 74, r: 18 },
       height: 420,
       xaxis: {
-        title: 'Date',
+        title: copy.dateAxisTitle,
         gridcolor: '#21262d',
         tickangle: -45,
         automargin: true
       },
-      yaxis: { title: 'Price (ISK)', gridcolor: '#21262d', automargin: true },
+      yaxis: { title: copy.priceAxisTitle, gridcolor: '#21262d', automargin: true },
       legend: { orientation: 'h', y: 1.12, x: 0 }
     }
   }
 }
 
-export function createForecastChartData(forecastData: MarketForecastResponse): ChartModel {
+export function createForecastChartData(
+  forecastData: MarketForecastComparisonResponse,
+  enabledMethodIds: string[],
+  locale: Locale
+): ChartModel {
+  const copy = getDashboardCopy(locale)
   const traces: Record<string, unknown>[] = [
     {
       type: 'scatter',
       mode: 'lines+markers',
-      name: 'Actual price',
+      name: copy.traceActualPrice,
       x: forecastData.actual_dates,
       y: forecastData.actual_values,
       line: {
@@ -303,20 +395,30 @@ export function createForecastChartData(forecastData: MarketForecastResponse): C
         width: 2
       },
       marker: { size: 4 },
-      hovertemplate: '%{x}<br>Actual: %{y:.4f} ISK<extra></extra>'
+      hovertemplate: `%{x}<br>${copy.hoverActualLabel}: %{y:.4f} ISK<extra></extra>`
     }
   ]
 
-  if (forecastData.forecast_dates.length && forecastData.forecast_values.length) {
+  for (const methodResult of forecastData.methods) {
+    if (
+      methodResult.status !== 'ok' ||
+      !enabledMethodIds.includes(methodResult.method) ||
+      !methodResult.forecast_dates.length ||
+      !methodResult.forecast_values.length
+    ) {
+      continue
+    }
+
+    const style = getForecastMethodStyle(methodResult.method)
     traces.push({
       type: 'scatter',
       mode: 'lines+markers',
-      name: 'Predict',
-      x: forecastData.forecast_dates,
-      y: forecastData.forecast_values,
-      line: { color: '#f78166', width: 2.5, dash: 'dash' },
-      marker: { size: 6, symbol: 'diamond' },
-      hovertemplate: '%{x}<br>Predict: %{y:.4f} ISK<extra></extra>'
+      name: methodResult.method_label,
+      x: methodResult.forecast_dates,
+      y: methodResult.forecast_values,
+      line: { color: style.color, width: 2.5, dash: style.dash },
+      marker: { size: 6, symbol: style.markerSymbol },
+      hovertemplate: `%{x}<br>${methodResult.method_label}: %{y:.4f} ISK<extra></extra>`
     })
   }
 
@@ -329,12 +431,12 @@ export function createForecastChartData(forecastData: MarketForecastResponse): C
       margin: { t: 36, b: 64, l: 74, r: 18 },
       height: 420,
       xaxis: {
-        title: 'Date',
+        title: copy.dateAxisTitle,
         gridcolor: '#21262d',
         tickangle: -45,
         automargin: true
       },
-      yaxis: { title: 'Price (ISK)', gridcolor: '#21262d', automargin: true },
+      yaxis: { title: copy.priceAxisTitle, gridcolor: '#21262d', automargin: true },
       legend: { orientation: 'h', y: 1.12, x: 0 }
     }
   }

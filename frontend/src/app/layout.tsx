@@ -4,8 +4,8 @@ import { UIProvider } from '@/components/providers/ui-provider'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'FluxEV Frontend',
-  description: 'Standalone Next.js frontend for the FluxEV market dashboard'
+  title: 'FluxEVEngine',
+  description: 'Рыночный дашборд FluxEVEngine'
 }
 
 interface Props {

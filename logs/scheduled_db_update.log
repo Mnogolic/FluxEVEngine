@@ -668,3 +668,9 @@ pg_ctl: could not start server: error code 87
 [2026-04-21 18:00:19] Waiting 60 seconds before sleep check...
 [2026-04-21 18:01:19] User idle for 165 minutes. Going to sleep.
 [2026-04-21 18:12:48] Scheduled DB update script ended.
+[2026-04-22 07:00:02] ============================================================
+[2026-04-22 07:00:02] Scheduled DB update started. Idle at start: 0 minutes.
+[2026-04-22 07:00:02] Checking PostgreSQL readiness...
+127.0.0.1:5432 - accepting connections
+[2026-04-22 07:00:02] PostgreSQL is already accepting connections.
+[2026-04-22 07:00:02] Running incremental ESI history update...

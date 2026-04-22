@@ -2,19 +2,23 @@
 
 import type { RefObject } from 'react'
 import styles from '@/components/dashboard.module.css'
+import { getDashboardCopy } from '@/components/dashboard/dashboard-copy'
 import { PlotlyChart } from '@/components/plotly-chart'
+import { DateRangeField } from '@/components/ui/date-range-field'
+import type { Locale } from '@/lib/locale'
 import { ChartPanelHeader } from './chart-panel-header'
-import { DashboardDateRange } from './dashboard-date-range'
 import { DashboardSelect } from './dashboard-select'
 import { PLOT_CONFIG } from './dashboard-utils'
 import type { DashboardPriceSectionModel } from './use-dashboard'
 
 interface ItemPriceSectionProps {
+  locale: Locale
   section: DashboardPriceSectionModel
   sectionRef: RefObject<HTMLElement | null>
 }
 
-export function ItemPriceSection({ section, sectionRef }: ItemPriceSectionProps) {
+export function ItemPriceSection({ locale, section, sectionRef }: ItemPriceSectionProps) {
+  const copy = getDashboardCopy(locale)
   const selectedItemOption =
     section.itemOptions.find((option) => option.value === section.selectedTypeId) ?? null
 
@@ -25,21 +29,23 @@ export function ItemPriceSection({ section, sectionRef }: ItemPriceSectionProps)
     >
       <ChartPanelHeader
         controls={
-          <DashboardDateRange
-            className="shrink-0"
+          <DateRangeField
+            locale={locale}
             maxDate={section.maxDate}
             minDate={section.minDate}
             onChange={section.onDateChange}
             range={section.dateRange}
           />
         }
-        title="Selected Item Price History"
+        title={copy.priceHistoryTitle}
       />
-      <div className={styles.chartNote}>Period: {section.rangeLabel}.</div>
+      <div className={styles.chartNote}>
+        {copy.periodLabel}: {section.rangeLabel}.
+      </div>
       <div className="mb-3 flex flex-wrap items-end gap-3">
         <DashboardSelect
           className="w-full basis-full"
-          label="Item"
+          label={copy.itemLabel}
           onChange={(value) => {
             if (value) {
               section.onTypeChange(value)
@@ -67,7 +73,7 @@ export function ItemPriceSection({ section, sectionRef }: ItemPriceSectionProps)
                   {option.label}
                 </span>
                 {optionMeta?.isFixedInRegion ? (
-                  <span className={styles.fixedBadge}>FIXED IN REGION</span>
+                  <span className={styles.fixedBadge}>{copy.fixedInRegionBadge}</span>
                 ) : null}
               </div>
             )
@@ -85,7 +91,7 @@ export function ItemPriceSection({ section, sectionRef }: ItemPriceSectionProps)
                   {selectedItemOption.label}
                 </span>
                 {selectedItemOption.isFixedInRegion ? (
-                  <span className={styles.fixedBadge}>FIXED IN REGION</span>
+                  <span className={styles.fixedBadge}>{copy.fixedInRegionBadge}</span>
                 ) : null}
               </div>
             ) : null
@@ -95,7 +101,7 @@ export function ItemPriceSection({ section, sectionRef }: ItemPriceSectionProps)
         />
         <DashboardSelect
           className="w-[160px] min-w-[140px] flex-[0_1_160px]"
-          label="Region"
+          label={copy.regionLabel}
           onChange={(value) => {
             const regionId = Number(value)
             if (Number.isFinite(regionId)) {
@@ -106,20 +112,22 @@ export function ItemPriceSection({ section, sectionRef }: ItemPriceSectionProps)
           selectedValue={String(section.selectedRegionId)}
         />
         <div className={styles.meta}>
-          {section.priceError ? `Chart error: ${section.priceError}` : null}
+          {section.priceError ? copy.chartError(section.priceError) : null}
           {!section.priceError && section.meta ? (
             <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-              {section.meta.isFixedPrice ? <span className={styles.fixedBadge}>FIXED</span> : null}
+              {section.meta.isFixedPrice ? (
+                <span className={styles.fixedBadge}>{copy.fixedBadge}</span>
+              ) : null}
               <span className={section.meta.trendUp ? styles.trendUp : styles.trendDown}>
                 {section.meta.trendText}
               </span>
               <span>|</span>
               <span>R2 {section.meta.r2.toFixed(3)}</span>
               <span>|</span>
-              <span>{section.meta.dataPointCount} pts</span>
+              <span>{copy.dataPoints(section.meta.dataPointCount)}</span>
             </div>
           ) : null}
-          {!section.priceError && !section.meta ? 'No data' : null}
+          {!section.priceError && !section.meta ? copy.noData : null}
         </div>
       </div>
 
@@ -129,7 +137,7 @@ export function ItemPriceSection({ section, sectionRef }: ItemPriceSectionProps)
         ) : null}
         {section.isSelectedItemFixedInRegion ? (
           <div className={styles.itemDetailBadges}>
-            <span className={styles.fixedBadge}>FIXED PRICE IN THIS REGION</span>
+            <span className={styles.fixedBadge}>{copy.fixedPriceInRegionBadge}</span>
           </div>
         ) : null}
       </div>

@@ -253,7 +253,10 @@ TOTAL        25,129,158,435 ISK        $164.23
 | GET | `/api/dashboard/overview` | Агрегированные данные дашборда для standalone frontend |
 | GET | `/market/items` | Список 1000 отслеживаемых товаров |
 | GET | `/market/history/{type_id}` | История цен по товару |
-| GET | `/market/price/{type_id}` | История + прогноз на 7 дней (JSON) |
+| GET | `/market/price/{type_id}` | История + базовый линейный прогноз на 7 дней |
+| GET | `/market/forecast-methods` | Список доступных моделей прогноза |
+| GET | `/market/forecast/{type_id}` | Прогноз одной выбранной моделью (`method=linear|holt_winters|arima|autoreg`) |
+| GET | `/market/forecast/compare/{type_id}` | Сравнение нескольких моделей на одном временном ряду |
 
 Полная документация: `http://localhost:8001/docs`
 

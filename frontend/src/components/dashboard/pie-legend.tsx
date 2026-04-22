@@ -1,11 +1,13 @@
 import type { CSSProperties } from 'react'
 import styles from '@/components/dashboard.module.css'
+import { getIntlLocale, type Locale } from '@/lib/locale'
 
 interface PieLegendProps {
   activeId?: string | null
   colors: string[]
   ids?: string[]
   labels: string[]
+  locale: Locale
   onItemClick?: (id: string) => void
   swatchGap?: number | string
   valueFormatter?: (value: number) => string
@@ -13,8 +15,8 @@ interface PieLegendProps {
   values: number[]
 }
 
-function formatShare(value: number): string {
-  return Number(value).toLocaleString('en-US', {
+function formatShare(value: number, locale: Locale): string {
+  return Number(value).toLocaleString(getIntlLocale(locale), {
     maximumFractionDigits: 3,
     minimumFractionDigits: 3
   })
@@ -38,6 +40,7 @@ export function PieLegend({
   colors,
   ids,
   labels,
+  locale,
   onItemClick,
   swatchGap,
   valueFormatter,
@@ -76,7 +79,7 @@ export function PieLegend({
               />
               <span className={styles.legendName}>{label}</span>
               <span className={styles.legendShare}>
-                {formatShare(shares[index])}%{suffix}
+                {formatShare(shares[index], locale)}%{suffix}
               </span>
             </span>
           </LegendItemTag>

@@ -1,20 +1,23 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { getDashboardCopy } from '@/components/dashboard/dashboard-copy'
 import { fetchFromApi } from '@/lib/api'
+import type { Locale } from '@/lib/locale'
 import type {
   DashboardItem,
   DashboardOverview,
   DateRangeValue,
-  MarketForecastResponse,
+  MarketForecastComparisonResponse,
   MarketPriceResponse,
   TrackedItemOption
 } from '@/types/dashboard'
 import {
   DEFAULT_REGION_ID,
+  DEFAULT_FORECAST_METHOD_IDS,
   OTHER_SLICE_ID,
   PIE_COLORS,
-  buildForecastPath,
+  buildForecastComparePath,
   buildOverviewPath,
   buildPricePath,
   createEmptyPriceChartData,
@@ -25,6 +28,7 @@ import {
   formatCompactIsk,
   formatNumber,
   formatShare,
+  getForecastMethodStyle,
   getDateRangeLabel,
   getOverviewErrorMessage,
   getPriceErrorMessage,
@@ -118,9 +122,27 @@ export interface DashboardForcastMeta {
   trainingDateTo: string | null
   trainingDataPointCount: number
   isFixedPrice: boolean
-  r2: number
-  trendText: string
-  trendUp: boolean
+  bestMethodLabel: string | null
+  methods: DashboardForcastMethodMeta[]
+}
+
+export interface DashboardForcastMethodMeta {
+  color: string
+  error: string | null
+  id: string
+  isBest: boolean
+  label: string
+  status: 'ok' | 'error'
+  validationMae: number | null
+  warning: string | null
+}
+
+export interface DashboardForcastMethodToggle {
+  color: string
+  id: string
+  isSelected: boolean
+  label: string
+  onSelectedChange: (checked: boolean) => void
 }
 
 export interface DashboardForcastSectionModel {
@@ -132,6 +154,7 @@ export interface DashboardForcastSectionModel {
   isSelectedItemFixedInRegion: boolean
   maxDate?: string
   meta: DashboardForcastMeta | null
+  methodToggles: DashboardForcastMethodToggle[]
   minDate?: string
   noteText: string
   onDateChange: (field: keyof DateRangeValue, value: string) => void
@@ -139,6 +162,7 @@ export interface DashboardForcastSectionModel {
 }
 
 interface UseDashboardParams {
+  locale: Locale
   onPriceChartFocus?: () => void
 }
 
@@ -160,15 +184,41 @@ function getInheritedPriceRange(itemDateRange: DateRangeValue): DateRangeValue {
   return itemDateRange.from || itemDateRange.to ? { ...itemDateRange } : { from: '', to: '' }
 }
 
-export function useDashboard({ onPriceChartFocus }: UseDashboardParams = {}): UseDashboardResult {
+const INITIAL_FORECAST_METHOD_SELECTION = DEFAULT_FORECAST_METHOD_IDS.reduce<
+  Record<string, boolean>
+>((selection, methodId) => {
+  selection[methodId] = true
+  return selection
+}, {})
+
+export function useDashboard({
+  locale,
+  onPriceChartFocus
+}: UseDashboardParams): UseDashboardResult {
+  const copy = getDashboardCopy(locale)
   const [overview, setOverview] = useState<DashboardOverview | null>(null)
   const [trackedItems, setTrackedItems] = useState<TrackedItemOption[]>([])
-  const [hubDateRange, setHubDateRange] = useState<DateRangeValue>({ from: '', to: '' })
-  const [itemDateRange, setItemDateRange] = useState<DateRangeValue>({ from: '', to: '' })
-  const [priceDateRange, setPriceDateRange] = useState<DateRangeValue>({ from: '', to: '' })
-  const [forecastDateRange, setForecastDateRange] = useState<DateRangeValue>({ from: '', to: '' })
+  const [hubDateRange, setHubDateRange] = useState<DateRangeValue>({
+    from: '',
+    to: ''
+  })
+  const [itemDateRange, setItemDateRange] = useState<DateRangeValue>({
+    from: '',
+    to: ''
+  })
+  const [priceDateRange, setPriceDateRange] = useState<DateRangeValue>({
+    from: '',
+    to: ''
+  })
+  const [forecastDateRange, setForecastDateRange] = useState<DateRangeValue>({
+    from: '',
+    to: ''
+  })
   const [forecastRangeDefaultKey, setForecastRangeDefaultKey] = useState<string | null>(null)
   const [forecastDays, setForecastDays] = useState(7)
+  const [forecastMethodSelection, setForecastMethodSelection] = useState<Record<string, boolean>>(
+    INITIAL_FORECAST_METHOD_SELECTION
+  )
   const [selectedItemScopeId, setSelectedItemScopeId] = useState(String(DEFAULT_REGION_ID))
   const [selectedTypeId, setSelectedTypeId] = useState<number | null>(null)
   const [selectedRegionId, setSelectedRegionId] = useState(DEFAULT_REGION_ID)
@@ -180,10 +230,14 @@ export function useDashboard({ onPriceChartFocus }: UseDashboardParams = {}): Us
   const [priceError, setPriceError] = useState<string | null>(null)
   const [forecastError, setForecastError] = useState<string | null>(null)
   const [priceData, setPriceData] = useState<MarketPriceResponse | null>(null)
-  const [forecastData, setForecastData] = useState<MarketForecastResponse | null>(null)
+  const [forecastData, setForecastData] = useState<MarketForecastComparisonResponse | null>(null)
   const [isLoadingOverview, setIsLoadingOverview] = useState(true)
   const [isLoadingPrice, setIsLoadingPrice] = useState(false)
   const [isLoadingForecast, setIsLoadingForecast] = useState(false)
+  const enabledForecastMethodIds = DEFAULT_FORECAST_METHOD_IDS.filter(
+    (methodId) => forecastMethodSelection[methodId]
+  )
+  const enabledForecastMethodKey = enabledForecastMethodIds.join(',')
 
   useEffect(() => {
     let cancelled = false
@@ -213,7 +267,7 @@ export function useDashboard({ onPriceChartFocus }: UseDashboardParams = {}): Us
         )
       } catch (error) {
         if (!cancelled) {
-          setOverviewError(getOverviewErrorMessage(error))
+          setOverviewError(getOverviewErrorMessage(error, locale))
         }
       } finally {
         if (!cancelled) {
@@ -227,7 +281,7 @@ export function useDashboard({ onPriceChartFocus }: UseDashboardParams = {}): Us
     return () => {
       cancelled = true
     }
-  }, [hubDateRange, itemDateRange])
+  }, [hubDateRange, itemDateRange, locale])
 
   useEffect(() => {
     let cancelled = false
@@ -302,7 +356,7 @@ export function useDashboard({ onPriceChartFocus }: UseDashboardParams = {}): Us
         }
       } catch (error) {
         if (!cancelled) {
-          setPriceError(getPriceErrorMessage(error))
+          setPriceError(getPriceErrorMessage(error, locale))
           setPriceData(null)
         }
       } finally {
@@ -317,7 +371,7 @@ export function useDashboard({ onPriceChartFocus }: UseDashboardParams = {}): Us
     return () => {
       cancelled = true
     }
-  }, [isOtherSelected, priceDateRange, selectedRegionId, selectedTypeId])
+  }, [isOtherSelected, locale, priceDateRange, selectedRegionId, selectedTypeId])
 
   useEffect(() => {
     setForecastDateRange({ from: '', to: '' })
@@ -337,14 +391,19 @@ export function useDashboard({ onPriceChartFocus }: UseDashboardParams = {}): Us
     let cancelled = false
 
     const loadForecast = async () => {
+      const activeForecastMethodIds = enabledForecastMethodKey
+        ? enabledForecastMethodKey.split(',')
+        : []
+
       setIsLoadingForecast(true)
       setForecastError(null)
 
       try {
-        const nextForecastData = await fetchFromApi<MarketForecastResponse>(
-          buildForecastPath({
+        const nextForecastData = await fetchFromApi<MarketForecastComparisonResponse>(
+          buildForecastComparePath({
             dateRange: forecastDateRange,
             forecastDays,
+            methodIds: activeForecastMethodIds,
             regionId: selectedRegionId,
             typeId: selectedTypeId
           })
@@ -355,7 +414,7 @@ export function useDashboard({ onPriceChartFocus }: UseDashboardParams = {}): Us
         }
       } catch (error) {
         if (!cancelled) {
-          setForecastError(getPriceErrorMessage(error))
+          setForecastError(getPriceErrorMessage(error, locale))
           setForecastData(null)
         }
       } finally {
@@ -370,7 +429,15 @@ export function useDashboard({ onPriceChartFocus }: UseDashboardParams = {}): Us
     return () => {
       cancelled = true
     }
-  }, [forecastDateRange, forecastDays, isOtherSelected, selectedRegionId, selectedTypeId])
+  }, [
+    enabledForecastMethodKey,
+    forecastDateRange,
+    forecastDays,
+    isOtherSelected,
+    locale,
+    selectedRegionId,
+    selectedTypeId
+  ])
 
   useEffect(() => {
     if (
@@ -435,20 +502,21 @@ export function useDashboard({ onPriceChartFocus }: UseDashboardParams = {}): Us
   const itemIds = visibleScopeItems.map((item) => String(item.type_id))
 
   if (shouldShowOther) {
-    itemLabels.push('Other')
+    itemLabels.push(copy.otherLabel)
     itemValuesIsk.push(hiddenScopeItems.reduce((sum, item) => sum + item.isk, 0))
     itemValuesUsd.push(hiddenScopeItems.reduce((sum, item) => sum + item.usd, 0))
     itemIds.push(OTHER_SLICE_ID)
   }
 
   const itemColors = itemLabels.map((label, index) =>
-    label === 'Other' ? '#8b949e' : PIE_COLORS[index % (PIE_COLORS.length - 1)]
+    label === copy.otherLabel ? '#8b949e' : PIE_COLORS[index % (PIE_COLORS.length - 1)]
   )
 
   const hubChart = createPieChartData({
-    centerLabel: 'Hubs',
+    centerLabel: copy.pieCenterHubs,
     colors: PIE_COLORS,
     labels: overview?.hub_labels ?? [],
+    locale,
     textinfo: 'label+percent',
     valuesIsk: overview?.hub_values_isk ?? [],
     valuesUsd: overview?.hub_values_usd ?? []
@@ -456,10 +524,11 @@ export function useDashboard({ onPriceChartFocus }: UseDashboardParams = {}): Us
 
   const itemScopeChart = createPieChartData({
     activeId: activeChartItemId,
-    centerLabel: selectedScopeRegionId === null ? 'Top 5' : selectedScopeLabel,
+    centerLabel: selectedScopeRegionId === null ? copy.topCenterLabel(5) : selectedScopeLabel,
     colors: itemColors,
     ids: itemIds,
     labels: itemLabels,
+    locale,
     textinfo: 'percent',
     valuesIsk: itemValuesIsk,
     valuesUsd: itemValuesUsd
@@ -478,44 +547,41 @@ export function useDashboard({ onPriceChartFocus }: UseDashboardParams = {}): Us
   const otherTotalIsk = hiddenScopeItems.reduce((sum, item) => sum + item.isk, 0)
   const otherShare = selectedScopeTotalIsk ? (otherTotalIsk / selectedScopeTotalIsk) * 100 : 0
   const emptyPriceChartText = isLoadingPrice
-    ? 'Loading chart...'
+    ? copy.emptyPriceChartLoading
     : selectedTypeId === null
-      ? 'No items in the selected turnover range'
-      : 'No market history for this item in the selected region'
+      ? copy.emptyPriceChartNoItems
+      : copy.emptyPriceChartNoHistory
 
   const priceChart = isOtherSliceSelected
-    ? createOtherPriceChartData()
+    ? createOtherPriceChartData(locale)
     : priceData && priceData.dates.length
-      ? createPriceHistoryChartData(priceData)
+      ? createPriceHistoryChartData(priceData, locale)
       : createEmptyPriceChartData(emptyPriceChartText)
   const emptyForecastChartText = isLoadingForecast
-    ? 'Loading forecast...'
+    ? copy.emptyForecastLoading
     : selectedTypeId === null
-      ? 'No items in the selected turnover range'
-      : 'No market history for this item in the selected region'
+      ? copy.emptyPriceChartNoItems
+      : copy.emptyPriceChartNoHistory
   const forcastChart = isOtherSliceSelected
-    ? createOtherPriceChartData()
+    ? createOtherPriceChartData(locale)
     : forecastData && forecastData.actual_dates.length
-      ? createForecastChartData(forecastData)
+      ? createForecastChartData(forecastData, enabledForecastMethodIds, locale)
       : createEmptyPriceChartData(emptyForecastChartText)
 
-  const scopeLocationText =
-    selectedScopeRegionId === null ? `across ${selectedScopeLabel}` : `in ${selectedScopeLabel}`
-  const scopeTurnoverText = `${selectedScopeLabel} turnover`
   const itemTurnoverTitle =
     jitaMode === 'all'
-      ? `All Items by Turnover ${scopeLocationText}`
-      : `Top ${boundedTopCount} Items by Turnover ${scopeLocationText}${shouldShowOther ? ' + Other' : ''}`
+      ? copy.itemTurnoverTitleAll(selectedScopeLabel)
+      : copy.itemTurnoverTitleTop(boundedTopCount, selectedScopeLabel, shouldShowOther)
   const shownCount =
     jitaMode === 'all' ? selectedScopeItemCount : Math.min(boundedTopCount, selectedScopeItemCount)
   const otherText =
     shouldShowOther && hiddenScopeItems.length > 0
-      ? ` + Other (${hiddenScopeItems.length} items)`
+      ? copy.itemTurnoverOtherSuffix(hiddenScopeItems.length)
       : ''
-  const hubRangeLabel = getDateRangeLabel(hubDateRange)
-  const itemRangeLabel = getDateRangeLabel(itemDateRange)
-  const priceRangeLabel = getDateRangeLabel(priceDateRange)
-  const forcastRangeLabel = getDateRangeLabel(forecastDateRange)
+  const hubRangeLabel = getDateRangeLabel(hubDateRange, locale)
+  const itemRangeLabel = getDateRangeLabel(itemDateRange, locale)
+  const priceRangeLabel = getDateRangeLabel(priceDateRange, locale)
+  const forcastRangeLabel = getDateRangeLabel(forecastDateRange, locale)
   const getScopeItemByTypeId = (typeId: number) =>
     selectedScopeItems.find((item) => item.type_id === typeId) ?? null
 
@@ -545,11 +611,21 @@ export function useDashboard({ onPriceChartFocus }: UseDashboardParams = {}): Us
   }
 
   const detailText = isOtherSliceSelected
-    ? `Other groups ${hiddenScopeItems.length} hidden items with ${formatCompactIsk(otherTotalIsk)} ISK turnover, or ${formatShare(otherShare)}% of ${scopeTurnoverText}. Open the item list or switch to All items to inspect them individually.`
+    ? copy.detailOther(
+        hiddenScopeItems.length,
+        formatCompactIsk(otherTotalIsk, locale),
+        formatShare(otherShare, locale),
+        selectedScopeLabel
+      )
     : selectedItem
-      ? `${selectedItem.name} - ${formatCompactIsk(selectedItem.isk)} ISK turnover - ${formatShare(selectedItem.share)}% of ${scopeTurnoverText}`
+      ? copy.detailSelectedItem(
+          selectedItem.name,
+          formatCompactIsk(selectedItem.isk, locale),
+          formatShare(selectedItem.share, locale),
+          selectedScopeLabel
+        )
       : selectedTrackedItem
-        ? `${selectedTrackedItem.name} selected from item list outside current turnover scope.`
+        ? copy.detailExternalSelection(selectedTrackedItem.name)
         : null
 
   const priceMeta =
@@ -558,10 +634,26 @@ export function useDashboard({ onPriceChartFocus }: UseDashboardParams = {}): Us
           dataPointCount: priceData.dates.length,
           isFixedPrice: priceData.is_fixed_price,
           r2: priceData.r2,
-          trendText: `${priceData.slope >= 0 ? '+' : '-'}${formatCompactIsk(Math.abs(priceData.slope))} ISK/d`,
+          trendText: `${priceData.slope >= 0 ? '+' : '-'}${formatCompactIsk(Math.abs(priceData.slope), locale)} ISK/d`,
           trendUp: priceData.slope >= 0
         }
       : null
+  const activeForecastMethods =
+    forecastData?.methods.filter((method) => enabledForecastMethodIds.includes(method.method)) ?? []
+  const forecastMethodMeta: DashboardForcastMethodMeta[] = activeForecastMethods.map((method) => {
+    const style = getForecastMethodStyle(method.method)
+    return {
+      color: style.color,
+      error: method.error,
+      id: method.method,
+      isBest:
+        method.status === 'ok' && forecastData?.best_method_by_validation_mae === method.method,
+      label: method.method_label,
+      status: method.status,
+      validationMae: method.metrics.validation_mae ?? null,
+      warning: method.warning
+    }
+  })
   const forcastMeta =
     !forecastError && forecastData
       ? {
@@ -570,20 +662,54 @@ export function useDashboard({ onPriceChartFocus }: UseDashboardParams = {}): Us
           trainingDateTo: forecastData.training_date_to,
           trainingDataPointCount: forecastData.training_data_point_count,
           isFixedPrice: forecastData.is_fixed_price,
-          r2: forecastData.r2,
-          trendText: `${forecastData.slope >= 0 ? '+' : '-'}${formatCompactIsk(Math.abs(forecastData.slope))} ISK/d`,
-          trendUp: forecastData.slope >= 0
+          bestMethodLabel:
+            forecastMethodMeta.find((method) => method.isBest)?.label ??
+            (forecastData.best_method_by_validation_mae
+              ? getForecastMethodStyle(forecastData.best_method_by_validation_mae).label
+              : null),
+          methods: forecastMethodMeta
         }
       : null
   const forcastNoteText = isOtherSliceSelected
-    ? 'Other combines multiple hidden items, so a single predict overlay is not available.'
+    ? copy.forecastOtherNote
     : !forecastData || !forecastData.actual_dates.length
-      ? 'Select an item with market history to compare actual prices against predict.'
+      ? copy.forecastSelectItemNote
       : !forecastData.training_date_from || !forecastData.training_date_to
-        ? `No market rows were found inside the selected training period ${forcastRangeLabel}, so predict cannot start yet. The actual line stays visible for context.`
-        : forecastData.training_data_point_count < 3
-          ? `Need at least 3 historical points inside ${forecastData.training_date_from} to ${forecastData.training_date_to} to build predict. The actual line stays visible for comparison.`
-          : `Predict is trained on ${forecastData.training_date_from} to ${forecastData.training_date_to} and projects ${forecastDays} day(s) ahead. The actual line stays visible across the full chart.`
+        ? copy.forecastNoRowsInRange(forcastRangeLabel)
+        : enabledForecastMethodIds.length === 0
+          ? copy.forecastAllModelsHidden
+          : forecastData.training_data_point_count < 3
+            ? copy.forecastNeedMorePoints(
+                forecastData.training_date_from,
+                forecastData.training_date_to
+              )
+            : activeForecastMethods.every((method) => method.status === 'error')
+              ? copy.forecastAllModelsFailed(
+                  forecastData.training_date_from,
+                  forecastData.training_date_to
+                )
+              : copy.forecastTrainedSummary(
+                  forecastData.training_date_from,
+                  forecastData.training_date_to,
+                  forecastDays
+                )
+  const forecastMethodToggles: DashboardForcastMethodToggle[] = DEFAULT_FORECAST_METHOD_IDS.map(
+    (methodId) => {
+      const style = getForecastMethodStyle(methodId)
+      return {
+        color: style.color,
+        id: methodId,
+        isSelected: Boolean(forecastMethodSelection[methodId]),
+        label: style.label,
+        onSelectedChange: (checked) => {
+          setForecastMethodSelection((currentSelection) => ({
+            ...currentSelection,
+            [methodId]: checked
+          }))
+        }
+      }
+    }
+  )
 
   return {
     forcastSection: {
@@ -595,6 +721,7 @@ export function useDashboard({ onPriceChartFocus }: UseDashboardParams = {}): Us
       isSelectedItemFixedInRegion,
       maxDate: forecastMaxDate,
       meta: forcastMeta,
+      methodToggles: forecastMethodToggles,
       minDate: forecastMinDate,
       noteText: forcastNoteText,
       onDateChange: (field, value) => {
@@ -608,8 +735,8 @@ export function useDashboard({ onPriceChartFocus }: UseDashboardParams = {}): Us
       }
     },
     header: {
-      lastUpdated: overview?.last_date ?? 'Loading...',
-      plexIskText: overview ? formatNumber(overview.plex_isk) : '...'
+      lastUpdated: overview?.last_date ?? copy.loading,
+      plexIskText: overview ? formatNumber(overview.plex_isk, locale) : '...'
     },
     overviewError,
     isLoadingOverview,
@@ -630,14 +757,23 @@ export function useDashboard({ onPriceChartFocus }: UseDashboardParams = {}): Us
       chart: itemScopeChart,
       dateRange: itemDateRange,
       includeOther,
-      itemScopeOptions: itemScopes.map((scope) => ({ label: scope.label, value: scope.id })),
+      itemScopeOptions: itemScopes.map((scope) => ({
+        label: scope.label,
+        value: scope.id
+      })),
       legendColors: itemColors,
       legendIds: itemIds,
       legendLabels: itemLabels,
       legendValues: itemValuesIsk,
       maxDate: lastAvailableDate,
       minDate: firstAvailableDate,
-      noteText: `Showing ${shownCount} of ${selectedScopeItemCount} tracked items ${scopeLocationText}${otherText}. Click a sector or item list row to inspect price history. Total turnover: ${formatCompactIsk(selectedScopeTotalIsk)} ISK.`,
+      noteText: copy.itemTurnoverNote(
+        shownCount,
+        selectedScopeItemCount,
+        selectedScopeLabel,
+        otherText,
+        formatCompactIsk(selectedScopeTotalIsk, locale)
+      ),
       onDateChange: (field, value) => {
         setIsOtherSelected(false)
         setItemDateRange((currentRange) => updateDateRangeValue(currentRange, field, value))
@@ -680,8 +816,8 @@ export function useDashboard({ onPriceChartFocus }: UseDashboardParams = {}): Us
         return {
           isFixedInRegion: isFixedInRegion(scopeItem, selectedRegionId),
           label: scopeItem
-            ? `${item.name} - ${formatCompactIsk(scopeItem.isk)} ISK - ${formatShare(scopeItem.share)}%${isFixedInRegion(scopeItem, selectedRegionId) ? ' - FIXED' : ''}`
-            : `${item.name} - not in selected turnover scope`,
+            ? `${item.name} - ${formatCompactIsk(scopeItem.isk, locale)} ISK - ${formatShare(scopeItem.share, locale)}%${isFixedInRegion(scopeItem, selectedRegionId) ? ` - ${copy.fixedBadge}` : ''}`
+            : `${item.name} - ${copy.itemNotInScopeLabel}`,
           value: String(item.type_id)
         }
       }),

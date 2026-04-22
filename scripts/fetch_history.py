@@ -198,7 +198,7 @@ async def main():
         pairs = pairs[:args.max_pairs]
 
     logger.info("=" * 60)
-    logger.info("FluxEV Engine - Historical Data Fetcher")
+    logger.info("FluxEVEngine - Historical Data Fetcher")
     logger.info("=" * 60)
     logger.info(f"Mode             : {'incremental' if args.incremental else 'full'}")
     logger.info(f"Items loaded     : {len(items)}")
