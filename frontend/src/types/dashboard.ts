@@ -22,6 +22,13 @@ export interface RegionOption {
   name: string
 }
 
+export interface TrackedItemOption {
+  id: number
+  type_id: number
+  name: string
+  added_at: string
+}
+
 export interface DashboardOverview {
   default_item_scope_id: string
   first_date: string
@@ -48,6 +55,22 @@ export interface MarketPriceResponse {
   values: number[]
   forecast_dates: string[]
   forecast_values: number[]
+  slope: number
+  r2: number
+  is_fixed_price: boolean
+}
+
+export interface MarketForecastResponse {
+  actual_dates: string[]
+  actual_values: number[]
+  forecast_dates: string[]
+  forecast_values: number[]
+  training_date_from: string | null
+  training_date_to: string | null
+  first_actual_date: string | null
+  last_actual_date: string | null
+  actual_data_point_count: number
+  training_data_point_count: number
   slope: number
   r2: number
   is_fixed_price: boolean

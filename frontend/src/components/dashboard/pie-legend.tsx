@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react'
 import styles from '@/components/dashboard.module.css'
 
 interface PieLegendProps {
@@ -5,7 +6,10 @@ interface PieLegendProps {
   colors: string[]
   ids?: string[]
   labels: string[]
+  onItemClick?: (id: string) => void
+  swatchGap?: number | string
   valueFormatter?: (value: number) => string
+  valueGap?: number | string
   values: number[]
 }
 
@@ -21,15 +25,30 @@ function getShares(values: number[]): number[] {
   return values.map((value) => (total ? (value / total) * 100 : 0))
 }
 
+function toCssSize(value?: number | string): string | undefined {
+  if (value === undefined) {
+    return undefined
+  }
+
+  return typeof value === 'number' ? `${value}px` : value
+}
+
 export function PieLegend({
   activeId,
   colors,
   ids,
   labels,
+  onItemClick,
+  swatchGap,
   valueFormatter,
+  valueGap,
   values
 }: PieLegendProps) {
   const shares = getShares(values)
+  const spacingStyle = {
+    '--legend-swatch-gap': toCssSize(swatchGap),
+    '--legend-value-gap': toCssSize(valueGap)
+  } as CSSProperties
 
   return (
     <div className={styles.legendGrid}>
@@ -37,22 +56,30 @@ export function PieLegend({
         const suffix = valueFormatter ? ` - ${valueFormatter(values[index])}` : ''
         const legendId = ids?.[index] ?? label
         const isActive = activeId !== null && activeId !== undefined && legendId === activeId
+        const LegendItemTag = onItemClick ? 'button' : 'div'
 
         return (
-          <div
-            className={`${styles.legendItem} ${isActive ? styles.legendItemActive : ''}`}
+          <LegendItemTag
+            className={`${styles.legendItem} ${isActive ? styles.legendItemActive : ''} ${
+              onItemClick ? styles.legendItemButton : ''
+            }`}
             key={`${label}-${index}`}
+            onClick={onItemClick ? () => onItemClick(legendId) : undefined}
+            style={spacingStyle}
             title={label}
+            {...(onItemClick ? { type: 'button' as const } : {})}
           >
-            <span
-              className={styles.legendSwatch}
-              style={{ background: colors[index % colors.length] }}
-            />
-            <span className={styles.legendName}>{label}</span>
-            <span className={styles.legendShare}>
-              {formatShare(shares[index])}%{suffix}
+            <span className={styles.legendContent}>
+              <span
+                className={styles.legendSwatch}
+                style={{ background: colors[index % colors.length] }}
+              />
+              <span className={styles.legendName}>{label}</span>
+              <span className={styles.legendShare}>
+                {formatShare(shares[index])}%{suffix}
+              </span>
             </span>
-          </div>
+          </LegendItemTag>
         )
       })}
     </div>

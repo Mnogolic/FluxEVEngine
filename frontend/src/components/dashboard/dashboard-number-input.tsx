@@ -1,9 +1,9 @@
 'use client'
 
-import { NumberInput } from '@teach-in/react'
-import styles from '@/components/dashboard.module.css'
+import { Number as DashboardNumber } from '@teach-in/react'
 
 interface DashboardNumberInputProps {
+  className?: string
   isDisabled?: boolean
   label: string
   max?: number
@@ -13,6 +13,7 @@ interface DashboardNumberInputProps {
 }
 
 export function DashboardNumberInput({
+  className,
   isDisabled,
   label,
   max,
@@ -21,17 +22,16 @@ export function DashboardNumberInput({
   value
 }: DashboardNumberInputProps) {
   return (
-    <div className={styles.controlField}>
-      <span className={styles.controlCaption}>{label}</span>
-      <NumberInput
+    <div className={['flex min-w-0 flex-col gap-1.5', className ?? ''].join(' ').trim()}>
+      <span className="text-xs text-[#8b949e]">{label}</span>
+      <DashboardNumber
         classNames={{
           base: 'w-[92px]',
           inputWrapper:
-            'min-h-10 rounded-md border border-[#30363d] bg-[#21262d] shadow-none transition-colors data-[hover=true]:border-[#58a6ff] data-[focus=true]:border-[#58a6ff]',
+            'min-h-10 rounded-md border border-[#30363d] bg-[#21262d] pl-3 pr-10 shadow-none transition-colors data-[hover=true]:border-[#58a6ff] data-[focus=true]:border-[#58a6ff] relative flex items-center',
           input: 'text-sm text-[#e6edf3]',
           stepperButton: 'text-[#8b949e]'
         }}
-        hideStepper={false}
         isClearable={false}
         isDisabled={isDisabled}
         max={max}

@@ -98,6 +98,13 @@
   gap: 10px;
 }
 
+.dateField {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 6px;
+}
+
 .controlLabel {
   display: inline-flex;
   align-items: center;
@@ -111,34 +118,98 @@
   position: relative;
   display: inline-flex;
   align-items: center;
+  min-width: 168px;
 }
 
 .dateInput {
-  min-width: 152px;
-  padding-right: 34px;
+  min-height: 40px;
+  min-width: 168px;
+  width: 100%;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  background: #21262d;
+  color: #e6edf3;
+  font-size: 14px;
+  line-height: 1.2;
+  padding: 10px 82px 10px 12px;
+  outline: none;
+  transition: border-color 0.18s ease;
+}
+
+.dateInput:hover,
+.dateInput:focus {
+  border-color: #58a6ff;
+}
+
+.dateInput::-webkit-calendar-picker-indicator {
+  width: 0;
+  height: 0;
+  margin: 0;
+  opacity: 0;
+}
+
+.dateInput::-webkit-date-and-time-value {
+  text-align: left;
 }
 
 .clearDateButton {
   position: absolute;
-  right: 8px;
+  top: 50%;
+  right: 40px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 18px;
-  height: 18px;
+  width: 24px;
+  height: 24px;
   border: 0;
   border-radius: 999px;
   background: rgba(139, 148, 158, 0.18);
   color: #c9d1d9;
   cursor: pointer;
-  font-size: 13px;
-  line-height: 1;
   padding: 0;
+  transform: translateY(-50%);
+  transition: background-color 0.18s ease, color 0.18s ease;
 }
 
 .clearDateButton:hover {
   background: rgba(88, 166, 255, 0.22);
   color: #ffffff;
+}
+
+.clearDateButton:focus-visible,
+.datePickerButton:focus-visible {
+  outline: 1px solid #58a6ff;
+  outline-offset: 1px;
+}
+
+.datePickerButton {
+  position: absolute;
+  top: 50%;
+  right: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(88, 166, 255, 0.08);
+  color: #8b949e;
+  cursor: pointer;
+  padding: 0;
+  transform: translateY(-50%);
+  transition: background-color 0.18s ease, color 0.18s ease;
+}
+
+.datePickerButton:hover {
+  background: rgba(88, 166, 255, 0.18);
+  color: #e6edf3;
+}
+
+.dateButtonIcon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
 }
 
 .toggleLabel {
@@ -167,27 +238,91 @@
 
 .itemDetail {
   display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.itemDetailText {
+  width: 100%;
+}
+
+.itemDetailBadges {
+  display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 8px;
-  margin-bottom: 10px;
+}
+
+.selectValueWrap {
+  display: flex;
+  max-width: 100%;
+  min-width: 0;
+  align-items: center;
+  gap: 8px;
+}
+
+.selectOptionWrap {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 8px;
+}
+
+.selectValueLabel {
+  min-width: 0;
+  overflow: hidden;
+  color: #e6edf3;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.selectOptionLabel {
+  display: block;
+  min-width: 0;
+  flex: 1 1 220px;
+  color: #e6edf3;
+  overflow-wrap: anywhere;
 }
 
 .fixedBadge {
   display: inline-flex;
   align-items: center;
   min-height: 20px;
-  border: 1px solid rgba(255, 166, 87, 0.45);
+  border: 1px solid rgba(247, 228, 99, 0.45);
   border-radius: 999px;
-  background: rgba(255, 166, 87, 0.12);
-  color: #ffa657;
+  background: rgba(247, 228, 99, 0.12);
+  color: #f7e463;
   font-size: 11px;
   font-weight: 650;
   line-height: 1;
   padding: 4px 8px;
 }
 
+.fixedSelectedValue {
+  color: #ffa657;
+  font-weight: 650;
+}
+
+.fixedSelectedValueLabel {
+  min-width: 0;
+  overflow: hidden;
+  color: #ffa657;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 650;
+}
+
+.fixedOptionLabel {
+  color: #ffa657;
+  font-weight: 650;
+}
+
 .chartShell {
+  position: relative;
   width: 100%;
   min-width: 0;
 }
@@ -207,14 +342,21 @@
 
 .legendDetails {
   margin-top: 10px;
-  border: 1px solid #30363d;
-  border-radius: 8px;
-  background: #0d1117;
-  overflow: hidden;
+  position: relative;
+  z-index: 2;
+}
+
+.legendDetails[open] {
+  z-index: 30;
 }
 
 .legendSummary {
+  display: inline-flex;
+  align-items: center;
   cursor: pointer;
+  border: 1px solid #30363d;
+  border-radius: 8px;
+  background: #0d1117;
   color: #c9d1d9;
   font-size: 12px;
   font-weight: 650;
@@ -240,14 +382,23 @@
 
 .legendDetails .legendGrid {
   margin-top: 0;
-  padding: 0 12px 12px;
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  max-height: min(320px, 60vh);
+  overflow: auto;
+  padding: 12px;
+  border: 1px solid #30363d;
+  border-radius: 8px;
+  background: #0d1117;
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.45);
+  z-index: 20;
 }
 
 .legendItem {
-  display: grid;
-  grid-template-columns: 10px minmax(0, 1fr) auto;
+  display: flex;
   align-items: center;
-  gap: 8px;
   min-width: 0;
   border: 1px solid transparent;
   border-radius: 8px;
@@ -256,6 +407,25 @@
   line-height: 1.3;
   padding: 6px 8px;
   transition: border-color 0.18s ease, background-color 0.18s ease;
+}
+
+.legendContent {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+}
+
+.legendItemButton {
+  width: 100%;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+}
+
+.legendItemButton:hover {
+  border-color: rgba(88, 166, 255, 0.35);
+  background: rgba(88, 166, 255, 0.08);
 }
 
 .legendItemActive {
@@ -267,9 +437,12 @@
   width: 10px;
   height: 10px;
   border-radius: 2px;
+  flex-shrink: 0;
+  margin-right: var(--legend-swatch-gap, 8px);
 }
 
 .legendName {
+  flex: 0 1 auto;
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -279,6 +452,8 @@
 .legendShare {
   color: #c9d1d9;
   font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+  margin-left: var(--legend-value-gap, 8px);
 }
 
 .wide {
@@ -307,15 +482,9 @@
 }
 
 .chartControls .controlSelect,
-.chartControls .controlNumber,
-.chartControls .dateInput {
+.chartControls .controlNumber {
   min-width: 96px;
   padding: 6px 9px;
-}
-
-.chartControls .dateInput {
-  min-width: 142px;
-  padding-right: 30px;
 }
 
 .topCountInput {
@@ -331,7 +500,8 @@
 }
 
 .meta {
-  min-width: 280px;
+  flex: 1 1 220px;
+  min-width: 0;
 }
 
 .chartMeta {
@@ -395,6 +565,8 @@
 
   .controlSelect,
   .dateInput,
+  .dateField,
+  .dateInputWrap,
   .itemSelect,
   .regionSelect,
   .meta {

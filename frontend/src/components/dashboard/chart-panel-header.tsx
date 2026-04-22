@@ -1,5 +1,4 @@
 import type { ReactNode } from 'react'
-import styles from '@/components/dashboard.module.css'
 
 interface ChartPanelHeaderProps {
   controls?: ReactNode
@@ -8,8 +7,8 @@ interface ChartPanelHeaderProps {
 
 export function ChartPanelHeader({ controls, title }: ChartPanelHeaderProps) {
   return (
-    <div className={styles.chartHead}>
-      <h2>{title}</h2>
+    <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+      <h2 className="text-[15px] leading-[1.35] font-[650] text-[#c9d1d9]">{title}</h2>
       {controls}
     </div>
   )

@@ -1,5 +1,5 @@
-import { Dashboard } from '@/components/dashboard'
+import { HomePageClient } from '@/app/home-page-client'
 
 export default function HomePage() {
-  return <Dashboard />
+  return <HomePageClient />
 }

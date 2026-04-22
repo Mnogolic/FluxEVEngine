@@ -1,113 +1,131 @@
 'use client'
 
-import { parseDate } from '@internationalized/date'
-import { Button, DatePicker } from '@teach-in/react'
+import { useRef } from 'react'
 import styles from '@/components/dashboard.module.css'
 import type { DateRangeValue } from '@/types/dashboard'
 
 interface DashboardDateRangeProps {
+  className?: string
   maxDate?: string
   minDate?: string
   onChange: (field: keyof DateRangeValue, value: string) => void
   range: DateRangeValue
 }
 
-function toCalendarDate(value?: string) {
-  return value ? parseDate(value) : null
+interface DashboardDateInputProps {
+  ariaLabel: string
+  clearLabel: string
+  label: string
+  max?: string
+  min?: string
+  onChange: (value: string) => void
+  value: string
+}
+
+function CalendarIcon() {
+  return (
+    <svg aria-hidden="true" className={styles.dateButtonIcon} fill="none" viewBox="0 0 20 20">
+      <rect height="12" rx="2.5" stroke="currentColor" strokeWidth="1.6" width="14" x="3" y="5" />
+      <path d="M6.5 3.5V7M13.5 3.5V7M3 8.5H17" stroke="currentColor" strokeWidth="1.6" />
+    </svg>
+  )
+}
+
+function ClearIcon() {
+  return (
+    <svg aria-hidden="true" className={styles.dateButtonIcon} fill="none" viewBox="0 0 20 20">
+      <path d="M6 6L14 14M14 6L6 14" stroke="currentColor" strokeWidth="1.8" />
+    </svg>
+  )
+}
+
+function DashboardDateInput({
+  ariaLabel,
+  clearLabel,
+  label,
+  max,
+  min,
+  onChange,
+  value
+}: DashboardDateInputProps) {
+  const inputRef = useRef<HTMLInputElement | null>(null)
+
+  const openPicker = () => {
+    const input = inputRef.current
+    if (!input) {
+      return
+    }
+
+    input.focus()
+    if (typeof input.showPicker === 'function') {
+      input.showPicker()
+    }
+  }
+
+  return (
+    <div className={styles.dateField}>
+      <span className="text-xs text-[#8b949e]">{label}</span>
+      <div className={styles.dateInputWrap}>
+        <input
+          ref={inputRef}
+          aria-label={ariaLabel}
+          className={styles.dateInput}
+          max={max}
+          min={min}
+          onChange={(event) => onChange(event.target.value)}
+          type="date"
+          value={value}
+        />
+        {value ? (
+          <button
+            aria-label={clearLabel}
+            className={styles.clearDateButton}
+            onClick={() => onChange('')}
+            type="button"
+          >
+            <ClearIcon />
+          </button>
+        ) : null}
+        <button
+          aria-label={`${label} calendar`}
+          className={styles.datePickerButton}
+          onClick={openPicker}
+          type="button"
+        >
+          <CalendarIcon />
+        </button>
+      </div>
+    </div>
+  )
 }
 
 export function DashboardDateRange({
+  className,
   maxDate,
   minDate,
   onChange,
   range
 }: DashboardDateRangeProps) {
-  const minValue = toCalendarDate(minDate)
-  const maxValue = toCalendarDate(maxDate)
-  const fromValue = toCalendarDate(range.from)
-  const toValue = toCalendarDate(range.to)
-
   return (
-    <div className={styles.dateRangeControls}>
-      <div className={styles.controlField}>
-        <span className={styles.controlCaption}>From</span>
-        <div className={styles.heroDateField}>
-          <DatePicker
-            aria-label="Start date"
-            calendarProps={{ showMonthAndYearPickers: true }}
-            classNames={{
-              base: 'min-w-[168px]',
-              inputWrapper:
-                'min-h-10 rounded-md border border-[#30363d] bg-[#21262d] shadow-none transition-colors data-[hover=true]:border-[#58a6ff] data-[focus=true]:border-[#58a6ff]',
-              input: 'text-sm text-[#e6edf3]',
-              segment: 'text-sm text-[#e6edf3] data-[placeholder=true]:text-[#8b949e]',
-              selectorButton: 'text-[#8b949e]',
-              selectorIcon: 'text-[#8b949e]',
-              popoverContent: 'border border-[#30363d] bg-[#161b22] text-[#e6edf3]',
-              calendarContent: 'bg-[#161b22] text-[#e6edf3]'
-            }}
-            granularity="day"
-            maxValue={toValue ?? maxValue}
-            minValue={minValue}
-            value={fromValue}
-            onChange={(value) => onChange('from', value?.toString() ?? '')}
-          />
-          {range.from ? (
-            <Button
-              isIconOnly
-              aria-label="Clear start date"
-              className={styles.dateClearButton}
-              radius="full"
-              size="sm"
-              type="button"
-              variant="light"
-              onPress={() => onChange('from', '')}
-            >
-              ×
-            </Button>
-          ) : null}
-        </div>
-      </div>
-
-      <div className={styles.controlField}>
-        <span className={styles.controlCaption}>To</span>
-        <div className={styles.heroDateField}>
-          <DatePicker
-            aria-label="End date"
-            calendarProps={{ showMonthAndYearPickers: true }}
-            classNames={{
-              base: 'min-w-[168px]',
-              inputWrapper:
-                'min-h-10 rounded-md border border-[#30363d] bg-[#21262d] shadow-none transition-colors data-[hover=true]:border-[#58a6ff] data-[focus=true]:border-[#58a6ff]',
-              input: 'text-sm text-[#e6edf3]',
-              segment: 'text-sm text-[#e6edf3] data-[placeholder=true]:text-[#8b949e]',
-              selectorButton: 'text-[#8b949e]',
-              selectorIcon: 'text-[#8b949e]',
-              popoverContent: 'border border-[#30363d] bg-[#161b22] text-[#e6edf3]',
-              calendarContent: 'bg-[#161b22] text-[#e6edf3]'
-            }}
-            granularity="day"
-            maxValue={maxValue}
-            minValue={fromValue ?? minValue}
-            value={toValue}
-            onChange={(value) => onChange('to', value?.toString() ?? '')}
-          />
-          {range.to ? (
-            <Button
-              isIconOnly
-              aria-label="Clear end date"
-              className={styles.dateClearButton}
-              radius="full"
-              size="sm"
-              type="button"
-              variant="light"
-              onPress={() => onChange('to', '')}
-            >
-              ×
-            </Button>
-          ) : null}
-        </div>
-      </div>
+    <div className={['flex flex-wrap items-center gap-2.5', className ?? ''].join(' ').trim()}>
+      <DashboardDateInput
+        ariaLabel="Start date"
+        clearLabel="Clear start date"
+        label="From"
+        max={range.to || maxDate}
+        min={minDate}
+        onChange={(value) => onChange('from', value)}
+        value={range.from}
+      />
+      <DashboardDateInput
+        ariaLabel="End date"
+        clearLabel="Clear end date"
+        label="To"
+        max={maxDate}
+        min={range.from || minDate}
+        onChange={(value) => onChange('to', value)}
+        value={range.to}
+      />
     </div>
   )
 }
