@@ -60,7 +60,8 @@ export interface DashboardCopy {
     totalCount: number,
     scopeLabel: string,
     otherText: string,
-    totalTurnover: string
+    totalTurnover: string,
+    totalTurnoverUsd: string
   ) => string
   itemTurnoverOtherSuffix: (count: number) => string
   itemTurnoverTitleAll: (scopeLabel: string) => string
@@ -156,8 +157,15 @@ const DASHBOARD_COPY: Record<Locale, DashboardCopy> = {
     itemLabel: 'Item',
     itemListSummary: (count) => `Item list (${count})`,
     itemNotInScopeLabel: 'not in selected turnover scope',
-    itemTurnoverNote: (shownCount, totalCount, scopeLabel, otherText, totalTurnover) =>
-      `Showing ${shownCount} of ${totalCount} tracked items (${scopeLabel})${otherText}. Click a sector or item list row to inspect price history. Total turnover: ${totalTurnover} ISK.`,
+    itemTurnoverNote: (
+      shownCount,
+      totalCount,
+      scopeLabel,
+      otherText,
+      totalTurnover,
+      totalTurnoverUsd
+    ) =>
+      `Showing ${shownCount} of ${totalCount} tracked items (${scopeLabel})${otherText}. Click a sector or item list row to inspect price history. Total turnover: ${totalTurnover} ISK (${totalTurnoverUsd}).`,
     itemTurnoverOtherSuffix: (count) => ` + Other (${count} items)`,
     itemTurnoverTitleAll: (scopeLabel) => `All Items by Turnover (${scopeLabel})`,
     itemTurnoverTitleTop: (count, scopeLabel, includeOther) =>
@@ -251,8 +259,15 @@ const DASHBOARD_COPY: Record<Locale, DashboardCopy> = {
     itemLabel: 'Предмет',
     itemListSummary: (count) => `Список предметов (${count})`,
     itemNotInScopeLabel: 'вне выбранного диапазона оборота',
-    itemTurnoverNote: (shownCount, totalCount, scopeLabel, otherText, totalTurnover) =>
-      `Показано ${shownCount} из ${totalCount} отслеживаемых предметов (${scopeLabel})${otherText}. Нажмите на сектор или строку в списке, чтобы посмотреть историю цены. Общий оборот: ${totalTurnover} ISK.`,
+    itemTurnoverNote: (
+      shownCount,
+      totalCount,
+      scopeLabel,
+      otherText,
+      totalTurnover,
+      totalTurnoverUsd
+    ) =>
+      `Показано ${shownCount} из ${totalCount} отслеживаемых предметов (${scopeLabel})${otherText}. Нажмите на сектор или строку в списке, чтобы посмотреть историю цены. Общий оборот: ${totalTurnover} ISK (${totalTurnoverUsd}).`,
     itemTurnoverOtherSuffix: (count) => ` + Прочее (${count} шт.)`,
     itemTurnoverTitleAll: (scopeLabel) => `Все предметы по обороту (${scopeLabel})`,
     itemTurnoverTitleTop: (count, scopeLabel, includeOther) =>

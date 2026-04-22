@@ -113,6 +113,15 @@ export function formatCompactIsk(value: number, locale: Locale): string {
   })
 }
 
+export function formatCompactUsd(value: number, locale: Locale): string {
+  return value.toLocaleString(getIntlLocale(locale), {
+    style: 'currency',
+    currency: 'USD',
+    notation: 'compact',
+    maximumFractionDigits: 2
+  })
+}
+
 export function formatShare(value: number, locale: Locale): string {
   return Number(value).toLocaleString(getIntlLocale(locale), {
     maximumFractionDigits: 3,

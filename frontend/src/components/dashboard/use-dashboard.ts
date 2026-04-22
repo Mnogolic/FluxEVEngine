@@ -26,6 +26,7 @@ import {
   createPieChartData,
   createPriceHistoryChartData,
   formatCompactIsk,
+  formatCompactUsd,
   formatNumber,
   formatShare,
   getForecastMethodStyle,
@@ -478,6 +479,7 @@ export function useDashboard({
     null
   const selectedScopeItemCount = selectedItemScope?.item_count ?? 0
   const selectedScopeTotalIsk = selectedItemScope?.total_isk ?? 0
+  const selectedScopeTotalUsd = selectedScopeItems.reduce((sum, item) => sum + item.usd, 0)
   const selectedScopeLabel = selectedItemScope?.label ?? 'Jita'
   const selectedScopeRegionId = selectedItemScope?.region_id ?? null
   const boundedTopCount = Math.max(
@@ -772,7 +774,8 @@ export function useDashboard({
         selectedScopeItemCount,
         selectedScopeLabel,
         otherText,
-        formatCompactIsk(selectedScopeTotalIsk, locale)
+        formatCompactIsk(selectedScopeTotalIsk, locale),
+        formatCompactUsd(selectedScopeTotalUsd, locale)
       ),
       onDateChange: (field, value) => {
         setIsOtherSelected(false)
