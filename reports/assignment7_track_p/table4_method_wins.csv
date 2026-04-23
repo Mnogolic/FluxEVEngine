@@ -1,0 +1,5 @@
+﻿Method,Win_count,Share_pct
+Linear Regression,0,0.0
+Holt-Winters ETS,4,40.0
+ARIMA,5,50.0
+AutoReg,1,10.0
