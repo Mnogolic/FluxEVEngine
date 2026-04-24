@@ -1,0 +1,6 @@
+﻿Scenario,Region,Item,Period,Observations,Forecast_days,Validation_days,Methods,Min_price_ISK,Max_price_ISK
+S1,Jita,Tritanium,2026-03-16..2026-04-20,36,7,7,"linear, holt_winters, arima, autoreg",3.86,4.22
+S2,Jita,Pyerite,2026-03-16..2026-04-20,36,7,7,"linear, holt_winters, arima, autoreg",16.41,19.1
+S3,Jita,Mexallon,2026-03-16..2026-04-20,36,7,7,"linear, holt_winters, arima, autoreg",55.2,68.49
+S4,Jita,Isogen,2026-03-16..2026-04-20,36,7,7,"linear, holt_winters, arima, autoreg",145.0,229.9
+S5,Jita,Nocxium,2026-03-16..2026-04-20,36,7,7,"linear, holt_winters, arima, autoreg",776.1,944.4

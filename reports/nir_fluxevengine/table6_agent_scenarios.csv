@@ -1,0 +1,13 @@
+﻿Scenario,Agent,Final_capital,Return_pct,Max_drawdown_pct,Trades
+Baseline,Conservative,10006.54,0.07,2.26,11
+Baseline,Balanced,10486.57,4.87,1.4,9
+Baseline,Aggressive,10880.3,8.8,1.38,3
+Liquidity Shock,Conservative,9962.62,-0.37,2.26,11
+Liquidity Shock,Balanced,9985.0,-0.15,3.41,10
+Liquidity Shock,Aggressive,9669.43,-3.31,9.28,4
+Pump and Dump,Conservative,10062.1,0.62,2.26,15
+Pump and Dump,Balanced,9974.38,-0.26,7.2,11
+Pump and Dump,Aggressive,9768.27,-2.32,13.1,5
+High Volatility,Conservative,9885.76,-1.14,4.3,13
+High Volatility,Balanced,10552.24,5.52,2.68,10
+High Volatility,Aggressive,11164.69,11.65,3.34,2

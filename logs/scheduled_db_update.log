@@ -726,3 +726,194 @@ pg_ctl: could not start server: error code 87
 [2026-04-22 18:00:17] Waiting 60 seconds before sleep check...
 [2026-04-22 18:01:17] User idle for 310 minutes. Going to sleep.
 [2026-04-22 22:09:28] Scheduled DB update script ended.
+[2026-04-23 07:00:01] ============================================================
+[2026-04-23 07:00:01] Scheduled DB update started. Idle at start: 0 minutes.
+[2026-04-23 07:00:01] Checking PostgreSQL readiness...
+127.0.0.1:5432 - accepting connections
+[2026-04-23 07:00:02] PostgreSQL is already accepting connections.
+[2026-04-23 07:00:02] Running incremental ESI history update...
+2026-04-23 07:00:02 [INFO] Loading existing market_history state from DB...
+2026-04-23 07:00:03 [INFO] ============================================================
+2026-04-23 07:00:03 [INFO] FluxEVEngine - Historical Data Fetcher
+2026-04-23 07:00:03 [INFO] ============================================================
+2026-04-23 07:00:03 [INFO] Mode             : incremental
+2026-04-23 07:00:03 [INFO] Items loaded     : 1000
+2026-04-23 07:00:03 [INFO] Regions          : Jita, Amarr, Dodixie, Hek, Rens
+2026-04-23 07:00:03 [INFO] Period           : last 30 days (since 2026-03-24)
+2026-04-23 07:00:03 [INFO] Fresh after      : 2026-04-21 (incremental skip threshold)
+2026-04-23 07:00:03 [INFO] Concurrency      : 15
+2026-04-23 07:00:03 [INFO] Max pairs        : all
+2026-04-23 07:00:03 [INFO] Pairs skipped    : 313 (already fresh)
+2026-04-23 07:00:03 [INFO] Total API calls  : ~4687
+2026-04-23 07:00:03 [INFO] ------------------------------------------------------------
+2026-04-23 07:00:04 [INFO] Progress: 100/4687 API calls | saved 100 | skipped 2694 | empty 0
+2026-04-23 07:00:04 [INFO] Progress: 200/4687 API calls | saved 199 | skipped 5387 | empty 0
+2026-04-23 07:00:05 [INFO] Progress: 300/4687 API calls | saved 297 | skipped 8059 | empty 0
+2026-04-23 07:00:05 [INFO] Progress: 400/4687 API calls | saved 395 | skipped 10743 | empty 0
+2026-04-23 07:00:06 [INFO] Progress: 500/4687 API calls | saved 490 | skipped 13352 | empty 0
+2026-04-23 07:00:07 [INFO] Progress: 600/4687 API calls | saved 588 | skipped 16031 | empty 0
+2026-04-23 07:00:07 [INFO] Progress: 700/4687 API calls | saved 679 | skipped 18584 | empty 0
+2026-04-23 07:00:08 [INFO] Progress: 800/4687 API calls | saved 775 | skipped 21109 | empty 0
+2026-04-23 07:00:09 [INFO] Progress: 900/4687 API calls | saved 868 | skipped 23648 | empty 0
+2026-04-23 07:00:09 [INFO] Progress: 1000/4687 API calls | saved 960 | skipped 26135 | empty 0
+2026-04-23 07:00:10 [INFO] Progress: 1100/4687 API calls | saved 1060 | skipped 28728 | empty 0
+2026-04-23 07:00:10 [INFO] Progress: 1200/4687 API calls | saved 1157 | skipped 31298 | empty 0
+2026-04-23 07:00:11 [INFO] Progress: 1300/4687 API calls | saved 1248 | skipped 33792 | empty 0
+2026-04-23 07:00:12 [INFO] Progress: 1400/4687 API calls | saved 1339 | skipped 36239 | empty 0
+2026-04-23 07:00:12 [INFO] Progress: 1500/4687 API calls | saved 1400 | skipped 38070 | empty 1
+2026-04-23 07:00:13 [INFO] Progress: 1600/4687 API calls | saved 1461 | skipped 39801 | empty 1
+2026-04-23 07:00:13 [INFO] Progress: 1700/4687 API calls | saved 1510 | skipped 41344 | empty 2
+2026-04-23 07:00:14 [INFO] Progress: 1800/4687 API calls | saved 1563 | skipped 42917 | empty 2
+2026-04-23 07:00:14 [INFO] Progress: 1900/4687 API calls | saved 1617 | skipped 44489 | empty 2
+2026-04-23 07:00:15 [INFO] Progress: 2000/4687 API calls | saved 1704 | skipped 46907 | empty 2
+2026-04-23 07:00:15 [INFO] Progress: 2100/4687 API calls | saved 1793 | skipped 49325 | empty 2
+2026-04-23 07:00:16 [INFO] Progress: 2200/4687 API calls | saved 1879 | skipped 51727 | empty 2
+2026-04-23 07:00:17 [INFO] Progress: 2300/4687 API calls | saved 1961 | skipped 54001 | empty 2
+2026-04-23 07:00:17 [INFO] Progress: 2400/4687 API calls | saved 2022 | skipped 55759 | empty 5
+2026-04-23 07:00:18 [INFO] Progress: 2500/4687 API calls | saved 2079 | skipped 57471 | empty 5
+2026-04-23 07:00:18 [INFO] Progress: 2600/4687 API calls | saved 2125 | skipped 58898 | empty 11
+2026-04-23 07:00:19 [INFO] Progress: 2700/4687 API calls | saved 2165 | skipped 60233 | empty 15
+2026-04-23 07:00:19 [INFO] Progress: 2800/4687 API calls | saved 2209 | skipped 61571 | empty 19
+2026-04-23 07:00:20 [INFO] Progress: 2900/4687 API calls | saved 2287 | skipped 63747 | empty 19
+2026-04-23 07:00:20 [INFO] Progress: 3000/4687 API calls | saved 2358 | skipped 65916 | empty 19
+2026-04-23 07:00:21 [INFO] Progress: 3100/4687 API calls | saved 2425 | skipped 67988 | empty 20
+2026-04-23 07:00:22 [INFO] Progress: 3200/4687 API calls | saved 2486 | skipped 69904 | empty 20
+2026-04-23 07:00:22 [INFO] Progress: 3300/4687 API calls | saved 2526 | skipped 71248 | empty 22
+2026-04-23 07:00:23 [INFO] Progress: 3400/4687 API calls | saved 2562 | skipped 72410 | empty 23
+2026-04-23 07:00:23 [INFO] Progress: 3500/4687 API calls | saved 2591 | skipped 73294 | empty 27
+2026-04-23 07:00:24 [INFO] Progress: 3600/4687 API calls | saved 2617 | skipped 74257 | empty 28
+2026-04-23 07:00:24 [INFO] Progress: 3700/4687 API calls | saved 2646 | skipped 75240 | empty 34
+2026-04-23 07:00:25 [INFO] Progress: 3800/4687 API calls | saved 2699 | skipped 76780 | empty 39
+2026-04-23 07:00:25 [INFO] Progress: 3900/4687 API calls | saved 2764 | skipped 78802 | empty 40
+2026-04-23 07:00:26 [INFO] Progress: 4000/4687 API calls | saved 2829 | skipped 80869 | empty 40
+2026-04-23 07:00:27 [INFO] Progress: 4100/4687 API calls | saved 2892 | skipped 82742 | empty 41
+2026-04-23 07:00:27 [INFO] Progress: 4200/4687 API calls | saved 2926 | skipped 84066 | empty 47
+2026-04-23 07:00:28 [INFO] Progress: 4300/4687 API calls | saved 2956 | skipped 85079 | empty 51
+2026-04-23 07:00:28 [INFO] Progress: 4400/4687 API calls | saved 2977 | skipped 85715 | empty 62
+2026-04-23 07:00:29 [INFO] Progress: 4500/4687 API calls | saved 3006 | skipped 86507 | empty 75
+2026-04-23 07:00:29 [INFO] Progress: 4600/4687 API calls | saved 3039 | skipped 87463 | empty 84
+2026-04-23 07:00:30 [INFO]   Jita       saved:   942 rows | skipped:  25678 | empty:   0
+2026-04-23 07:00:30 [INFO]   Amarr      saved:   697 rows | skipped:  19435 | empty:   2
+2026-04-23 07:00:30 [INFO]   Dodixie    saved:   597 rows | skipped:  17220 | empty:  17
+2026-04-23 07:00:30 [INFO]   Hek        saved:   439 rows | skipped:  13826 | empty:  19
+2026-04-23 07:00:30 [INFO]   Rens       saved:   393 rows | skipped:  12265 | empty:  60
+2026-04-23 07:00:30 [INFO] ------------------------------------------------------------
+2026-04-23 07:00:30 [INFO] Total new rows saved : 3068
+2026-04-23 07:00:30 [INFO] Total rows skipped   : 88424 (already in DB)
+2026-04-23 07:00:30 [INFO] Fresh pairs skipped  : 313 (no ESI call)
+2026-04-23 07:00:30 [INFO] Empty ESI responses  : 98
+2026-04-23 07:00:30 [INFO] Total time           : 27.2s
+2026-04-23 07:00:30 [INFO] ============================================================
+[2026-04-23 07:00:30] Scheduled DB update finished successfully.
+[2026-04-23 07:00:30] Waiting 60 seconds before sleep check...
+[2026-04-23 18:00:02] Removing stale lock file for exited PID 9312. Lock age: 660 minutes.
+[2026-04-23 18:00:02] ============================================================
+[2026-04-23 18:00:02] Scheduled DB update started. Idle at start: 138 minutes.
+[2026-04-23 18:00:02] Checking PostgreSQL readiness...
+127.0.0.1:5432 - accepting connections
+[2026-04-23 18:00:02] PostgreSQL is already accepting connections.
+[2026-04-23 18:00:02] Running incremental ESI history update...
+2026-04-23 18:00:04 [INFO] Loading existing market_history state from DB...
+2026-04-23 18:00:04 [INFO] ============================================================
+2026-04-23 18:00:04 [INFO] FluxEVEngine - Historical Data Fetcher
+2026-04-23 18:00:04 [INFO] ============================================================
+2026-04-23 18:00:04 [INFO] Mode             : incremental
+2026-04-23 18:00:04 [INFO] Items loaded     : 1000
+2026-04-23 18:00:04 [INFO] Regions          : Jita, Amarr, Dodixie, Hek, Rens
+2026-04-23 18:00:04 [INFO] Period           : last 30 days (since 2026-03-24)
+2026-04-23 18:00:04 [INFO] Fresh after      : 2026-04-21 (incremental skip threshold)
+2026-04-23 18:00:04 [INFO] Concurrency      : 15
+2026-04-23 18:00:04 [INFO] Max pairs        : all
+2026-04-23 18:00:04 [INFO] Pairs skipped    : 3379 (already fresh)
+2026-04-23 18:00:04 [INFO] Total API calls  : ~1621
+2026-04-23 18:00:04 [INFO] ------------------------------------------------------------
+2026-04-23 18:00:06 [INFO] Progress: 100/1621 API calls | saved 54 | skipped 1126 | empty 1
+2026-04-23 18:00:08 [INFO] Progress: 200/1621 API calls | saved 78 | skipped 1753 | empty 2
+2026-04-23 18:00:10 [INFO] Progress: 300/1621 API calls | saved 93 | skipped 2447 | empty 2
+2026-04-23 18:00:11 [INFO] Progress: 400/1621 API calls | saved 118 | skipped 3305 | empty 5
+2026-04-23 18:00:11 [INFO] Progress: 500/1621 API calls | saved 135 | skipped 3839 | empty 15
+2026-04-23 18:00:12 [INFO] Progress: 600/1621 API calls | saved 149 | skipped 4281 | empty 19
+2026-04-23 18:00:13 [INFO] Progress: 700/1621 API calls | saved 191 | skipped 5368 | empty 20
+2026-04-23 18:00:13 [INFO] Progress: 800/1621 API calls | saved 213 | skipped 6094 | empty 22
+2026-04-23 18:00:14 [INFO] Progress: 900/1621 API calls | saved 227 | skipped 6451 | empty 27
+2026-04-23 18:00:14 [INFO] Progress: 1000/1621 API calls | saved 244 | skipped 6890 | empty 29
+2026-04-23 18:00:15 [INFO] Progress: 1100/1621 API calls | saved 253 | skipped 7300 | empty 38
+2026-04-23 18:00:16 [INFO] Progress: 1200/1621 API calls | saved 287 | skipped 8333 | empty 41
+2026-04-23 18:00:16 [INFO] Progress: 1300/1621 API calls | saved 313 | skipped 9016 | empty 49
+2026-04-23 18:00:17 [INFO] Progress: 1400/1621 API calls | saved 324 | skipped 9317 | empty 56
+2026-04-23 18:00:18 [INFO] Progress: 1500/1621 API calls | saved 331 | skipped 9561 | empty 73
+2026-04-23 18:00:18 [INFO] Progress: 1600/1621 API calls | saved 341 | skipped 9819 | empty 93
+2026-04-23 18:00:19 [INFO]   Jita       saved:    26 rows | skipped:    566 | empty:   0
+2026-04-23 18:00:19 [INFO]   Amarr      saved:    64 rows | skipped:   1702 | empty:   2
+2026-04-23 18:00:19 [INFO]   Dodixie    saved:    61 rows | skipped:   2054 | empty:  17
+2026-04-23 18:00:19 [INFO]   Hek        saved:   100 rows | skipped:   2981 | empty:  19
+2026-04-23 18:00:19 [INFO]   Rens       saved:    93 rows | skipped:   2606 | empty:  60
+2026-04-23 18:00:19 [INFO] ------------------------------------------------------------
+2026-04-23 18:00:19 [INFO] Total new rows saved : 344
+2026-04-23 18:00:19 [INFO] Total rows skipped   : 9909 (already in DB)
+2026-04-23 18:00:19 [INFO] Fresh pairs skipped  : 3379 (no ESI call)
+2026-04-23 18:00:19 [INFO] Empty ESI responses  : 98
+2026-04-23 18:00:19 [INFO] Total time           : 14.6s
+2026-04-23 18:00:19 [INFO] ============================================================
+[2026-04-23 18:00:19] Scheduled DB update finished successfully.
+[2026-04-23 18:00:19] Waiting 60 seconds before sleep check...
+[2026-04-23 18:01:19] User idle for 139 minutes. Going to sleep.
+[2026-04-23 21:03:45] Scheduled DB update script ended.
+[2026-04-24 07:00:02] ============================================================
+[2026-04-24 07:00:02] Scheduled DB update started. Idle at start: 114 minutes.
+[2026-04-24 07:00:02] Checking PostgreSQL readiness...
+127.0.0.1:5432 - accepting connections
+[2026-04-24 07:00:02] PostgreSQL is already accepting connections.
+[2026-04-24 07:00:02] Running incremental ESI history update...
+2026-04-24 07:00:07 [INFO] Loading existing market_history state from DB...
+2026-04-24 07:00:07 [INFO] ============================================================
+2026-04-24 07:00:07 [INFO] FluxEVEngine - Historical Data Fetcher
+2026-04-24 07:00:07 [INFO] ============================================================
+2026-04-24 07:00:07 [INFO] Mode             : incremental
+2026-04-24 07:00:07 [INFO] Items loaded     : 1000
+2026-04-24 07:00:07 [INFO] Regions          : Jita, Amarr, Dodixie, Hek, Rens
+2026-04-24 07:00:07 [INFO] Period           : last 30 days (since 2026-03-25)
+2026-04-24 07:00:07 [INFO] Fresh after      : 2026-04-22 (incremental skip threshold)
+2026-04-24 07:00:07 [INFO] Concurrency      : 15
+2026-04-24 07:00:07 [INFO] Max pairs        : all
+2026-04-24 07:00:07 [INFO] Pairs skipped    : 3395 (already fresh)
+2026-04-24 07:00:07 [INFO] Total API calls  : ~1605
+2026-04-24 07:00:07 [INFO] ------------------------------------------------------------
+2026-04-24 07:00:08 [INFO] Progress: 100/1605 API calls | saved 0 | skipped 1125 | empty 1
+2026-04-24 07:00:08 [INFO] Progress: 200/1605 API calls | saved 0 | skipped 1774 | empty 2
+2026-04-24 07:00:09 [INFO] Progress: 300/1605 API calls | saved 0 | skipped 2546 | empty 2
+2026-04-24 07:00:09 [INFO] Progress: 400/1605 API calls | saved 0 | skipped 3274 | empty 5
+2026-04-24 07:00:10 [INFO] Progress: 500/1605 API calls | saved 0 | skipped 3852 | empty 13
+2026-04-24 07:00:10 [INFO] Progress: 600/1605 API calls | saved 0 | skipped 4215 | empty 18
+2026-04-24 07:00:11 [INFO] Progress: 700/1605 API calls | saved 0 | skipped 5135 | empty 20
+2026-04-24 07:00:12 [INFO] Progress: 800/1605 API calls | saved 0 | skipped 5666 | empty 23
+2026-04-24 07:00:12 [INFO] Progress: 900/1605 API calls | saved 0 | skipped 6011 | empty 27
+2026-04-24 07:00:13 [INFO] Progress: 1000/1605 API calls | saved 0 | skipped 6414 | empty 29
+2026-04-24 07:00:13 [INFO] Progress: 1100/1605 API calls | saved 0 | skipped 6943 | empty 39
+2026-04-24 07:00:14 [INFO] Progress: 1200/1605 API calls | saved 0 | skipped 7973 | empty 42
+2026-04-24 07:00:15 [INFO] Progress: 1300/1605 API calls | saved 0 | skipped 8580 | empty 50
+2026-04-24 07:00:15 [INFO] Progress: 1400/1605 API calls | saved 0 | skipped 8881 | empty 60
+2026-04-24 07:00:16 [INFO] Progress: 1500/1605 API calls | saved 0 | skipped 9279 | empty 77
+2026-04-24 07:00:17 [INFO] Progress: 1600/1605 API calls | saved 0 | skipped 9539 | empty 97
+2026-04-24 07:00:17 [INFO]   Jita       saved:     0 rows | skipped:    374 | empty:   0
+2026-04-24 07:00:17 [INFO]   Amarr      saved:     0 rows | skipped:   1840 | empty:   2
+2026-04-24 07:00:17 [INFO]   Dodixie    saved:     0 rows | skipped:   2062 | empty:  17
+2026-04-24 07:00:17 [INFO]   Hek        saved:     0 rows | skipped:   2562 | empty:  19
+2026-04-24 07:00:17 [INFO]   Rens       saved:     0 rows | skipped:   2747 | empty:  60
+2026-04-24 07:00:17 [INFO] ------------------------------------------------------------
+2026-04-24 07:00:17 [INFO] Total new rows saved : 0
+2026-04-24 07:00:17 [INFO] Total rows skipped   : 9585 (already in DB)
+2026-04-24 07:00:17 [INFO] Fresh pairs skipped  : 3395 (no ESI call)
+2026-04-24 07:00:17 [INFO] Empty ESI responses  : 98
+2026-04-24 07:00:17 [INFO] Total time           : 9.8s
+2026-04-24 07:00:17 [INFO] ============================================================
+[2026-04-24 07:00:17] Scheduled DB update finished successfully.
+[2026-04-24 07:00:17] Waiting 60 seconds before sleep check...
+[2026-04-24 07:01:17] User idle for 115 minutes. Going to sleep.
+[2026-04-24 17:46:26] Scheduled DB update script ended.
+[2026-04-24 18:00:01] ============================================================
+[2026-04-24 18:00:01] Scheduled DB update started. Idle at start: 4 minutes.
+[2026-04-24 18:00:01] Checking PostgreSQL readiness...
+127.0.0.1:5432 - accepting connections
+[2026-04-24 18:00:02] PostgreSQL is already accepting connections.
+[2026-04-24 18:00:02] Running incremental ESI history update...

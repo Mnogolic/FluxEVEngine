@@ -1,0 +1,7 @@
+﻿Layer,Technologies,Purpose
+Серверная логика,"Python 3.12, FastAPI, Uvicorn",Реализация REST API и оркестрация сервисов
+Хранение данных,"PostgreSQL 17, SQLAlchemy async, asyncpg, Alembic","Хранение истории рынка, ORM и миграции схемы"
+Сбор данных,"aiohttp, ESI API, APScheduler",Асинхронная загрузка и ежедневное обновление рыночной истории
+Аналитика и прогноз,"NumPy, statsmodels","Расчёт метрик, регрессии и временных моделей"
+Визуализация,"Next.js, React, Plotly.js","Dashboard, графики и интерактивное сравнение моделей"
+Автоматизация,"GitHub Actions, Bun","CI/CD, сборка frontend и выпуск архивов релиза"

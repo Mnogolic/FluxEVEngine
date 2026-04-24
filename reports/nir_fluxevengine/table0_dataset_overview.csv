@@ -1,0 +1,11 @@
+﻿Metric,Value
+Tracked items,1000
+Market history rows,128102
+Distinct item types,1000
+Distinct regions,5
+Date from,2025-02-01
+Date to,2026-04-22
+Stable experiment window,2026-03-16..2026-04-20
+Rows in stable window,123107
+Forecast horizon (days),7
+Validation window (days),7

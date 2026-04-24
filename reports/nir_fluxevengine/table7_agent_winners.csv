@@ -1,0 +1,5 @@
+﻿Scenario,Best_agent,Return_pct,Max_drawdown_pct
+Baseline,Aggressive,8.8,1.38
+Liquidity Shock,Balanced,-0.15,3.41
+Pump and Dump,Conservative,0.62,2.26
+High Volatility,Aggressive,11.65,3.34
